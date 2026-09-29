@@ -1,47 +1,51 @@
 /**
  * Studi Kasus Praktikum 3 — PABWE
- * Fitur:
- * 1. Tab Switcher + localStorage
- * 2. Catatan Pengeluaran Harian (Expense Tracker CRUD + Ringkasan Saldo)
- * 3. Bookmark / Link Manager (Validasi URL + Filter & Sort)
- * 4. Kuis Interaktif (Pilihan Ganda, Skor & High Score)
+ * Penulis: [Isi Nama / NIM Anda]
+ * 
+ * Modul:
+ * 1. Utilitas & Modal Manager
+ * 2. Integrasi Navigasi Tab (3.4)
+ * 3. Catatan Pengeluaran Harian / Expense Tracker (3.1)
+ * 4. Bookmark / Link Manager (3.2)
+ * 5. Kuis Interaktif / Quiz App (3.3)
  */
 
 /* ==========================================================================
-   0. HELPER & UTILITAS GLOBAL
+   1. UTILITAS & MODAL MANAGER
    ========================================================================== */
 
 const $ = (selector) => {
   const el = document.querySelector(selector);
-  if (!el) throw new Error(`Elemen dengan selektor "${selector}" tidak ditemukan.`);
+  if (!el) throw new Error(`Elemen "${selector}" tidak ditemukan.`);
   return el;
 };
 
 const $all = (selector) => document.querySelectorAll(selector);
 
-/** Format angka ke format mata uang Rupiah */
-function formatRupiah(number) {
+/** Format bilangan ke Rupiah (IDR) */
+function formatRupiah(amount) {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
     maximumFractionDigits: 0,
-  }).format(number);
+  }).format(amount);
 }
 
-/** Tampilkan / Sembunyikan Modal */
-function openModal(modalEl) {
-  modalEl.classList.remove("hidden");
-  modalEl.classList.add("flex");
+/** Tampilkan Modal */
+function openModal(modal) {
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
   document.body.classList.add("overflow-hidden");
 }
 
-function closeModal(modalEl) {
-  modalEl.classList.add("hidden");
-  modalEl.classList.remove("flex");
+/** Tutup Modal */
+function closeModal(modal) {
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
   document.body.classList.remove("overflow-hidden");
 }
 
-// Tutup semua modal lewat tombol close atau klik backdrop
+// Tutup modal lewat tombol close atau klik latar belakang (backdrop)
 $all(".btn-close-modal").forEach((btn) => {
   btn.addEventListener("click", (e) => {
     const modal = e.target.closest('[role="dialog"]');
@@ -56,7 +60,7 @@ $all(".modal-backdrop").forEach((backdrop) => {
   });
 });
 
-// Escape key listener untuk menutup modal
+// Listener tombol Escape keyboard
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     $all('[role="dialog"]').forEach((modal) => {
@@ -65,12 +69,31 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+// Modal Hapus Universal
+const modalDelete = $("#modal-delete");
+const modalDeleteItemTitle = $("#modal-delete-item-title");
+const btnConfirmDelete = $("#btn-confirm-delete");
+let deleteActionCallback = null;
+
+function openDeleteModal(title, onConfirm) {
+  modalDeleteItemTitle.textContent = `"${title}"`;
+  deleteActionCallback = onConfirm;
+  openModal(modalDelete);
+}
+
+btnConfirmDelete.addEventListener("click", () => {
+  if (typeof deleteActionCallback === "function") {
+    deleteActionCallback();
+  }
+  closeModal(modalDelete);
+});
+
 
 /* ==========================================================================
-   1. TAB SWITCHER (PERSISTEN)
+   2. INTEGRASI TAB DENGAN PERSISTENSI (3.4)
    ========================================================================== */
 
-const TAB_STORAGE_KEY = "pabwe-p3-current-tab";
+const TAB_STORAGE_KEY = "pabwe-sk-active-tab";
 const tabButtons = $all(".tab-btn");
 const panels = {
   expense: $("#panel-expense"),
@@ -78,44 +101,46 @@ const panels = {
   quiz: $("#panel-quiz"),
 };
 
-function switchTab(name) {
-  if (!panels[name]) name = "expense";
+function switchTab(targetTab) {
+  if (!panels[targetTab]) targetTab = "expense";
 
+  // Tampilkan hanya panel yang aktif
   Object.entries(panels).forEach(([key, panel]) => {
-    panel.classList.toggle("hidden", key !== name);
+    panel.classList.toggle("hidden", key !== targetTab);
   });
 
+  // Highlight tombol tab aktif
   tabButtons.forEach((btn) => {
-    const active = btn.dataset.tab === name;
-    btn.setAttribute("aria-selected", String(active));
-    btn.classList.toggle("bg-slate-900", active);
-    btn.classList.toggle("text-white", active);
-    btn.classList.toggle("shadow-md", active);
-    btn.classList.toggle("text-slate-600", !active);
-    btn.classList.toggle("hover:bg-slate-100", !active);
+    const isActive = btn.dataset.tab === targetTab;
+    btn.setAttribute("aria-selected", String(isActive));
+    btn.classList.toggle("bg-slate-900", isActive);
+    btn.classList.toggle("text-white", isActive);
+    btn.classList.toggle("shadow-md", isActive);
+    btn.classList.toggle("text-slate-600", !isActive);
+    btn.classList.toggle("hover:bg-slate-100", !isActive);
   });
 
-  localStorage.setItem(TAB_STORAGE_KEY, name);
+  localStorage.setItem(TAB_STORAGE_KEY, targetTab);
 }
 
 tabButtons.forEach((btn) => {
   btn.addEventListener("click", () => switchTab(btn.dataset.tab));
 });
 
-// Load tab terakhir dari localStorage
+// Pulihkan tab terakhir yang dikunjungi pengguna
 const savedTab = localStorage.getItem(TAB_STORAGE_KEY) || "expense";
 switchTab(savedTab);
 
 
 /* ==========================================================================
-   2. CATATAN PENGELUARAN HARIAN (EXPENSE TRACKER)
+   3. CATATAN PENGELUARAN HARIAN (EXPENSE TRACKER - 3.1)
    ========================================================================== */
 
-const EXPENSE_STORAGE_KEY = "pabwe-p3-expense-data";
+const EXPENSE_STORAGE_KEY = "pabwe-sk-expenses";
 let expenses = loadExpenses();
 let editingExpenseId = null;
 
-// DOM Elements Expense
+// Elemen DOM Expense
 const expForm = $("#exp-form");
 const expTitle = $("#exp-title");
 const expAmount = $("#exp-amount");
@@ -131,7 +156,7 @@ const expTotalIncome = $("#exp-total-income");
 const expTotalExpense = $("#exp-total-expense");
 const expBalance = $("#exp-balance");
 
-// Modal Elements Expense
+// Elemen Modal Edit Expense
 const modalEditExp = $("#modal-edit-exp");
 const expEditForm = $("#exp-edit-form");
 const expEditTitle = $("#exp-edit-title");
@@ -140,7 +165,7 @@ const expEditType = $("#exp-edit-type");
 const expEditCategory = $("#exp-edit-category");
 const expEditDate = $("#exp-edit-date");
 
-// Inisialisasi default tanggal hari ini pada form tambah
+// Inisialisasi default input tanggal ke hari ini
 expDate.valueAsDate = new Date();
 
 function loadExpenses() {
@@ -161,8 +186,11 @@ function updateExpenseSummary() {
   let expense = 0;
 
   expenses.forEach((item) => {
-    if (item.type === "income") income += item.amount;
-    else expense += item.amount;
+    if (item.type === "income") {
+      income += item.amount;
+    } else {
+      expense += item.amount;
+    }
   });
 
   const balance = income - expense;
@@ -180,14 +208,16 @@ function renderExpenses() {
   const filterType = expFilterType.value;
   const sort = expSort.value;
 
-  // Filter
+  // Filter pencarian & tipe
   let items = expenses.filter((item) => {
-    const matchQuery = item.title.toLowerCase().includes(query) || item.category.toLowerCase().includes(query);
+    const matchQuery =
+      item.title.toLowerCase().includes(query) ||
+      item.category.toLowerCase().includes(query);
     const matchType = filterType === "all" || item.type === filterType;
     return matchQuery && matchType;
   });
 
-  // Sort
+  // Sorting
   items.sort((a, b) => {
     switch (sort) {
       case "oldest":
@@ -202,7 +232,6 @@ function renderExpenses() {
     }
   });
 
-  // Empty state handling
   const noData = expenses.length === 0;
   expEmpty.classList.toggle("hidden", !noData);
   expList.classList.toggle("hidden", noData);
@@ -212,7 +241,7 @@ function renderExpenses() {
   if (!noData && items.length === 0) {
     expList.innerHTML = `
       <li class="p-4 text-center text-sm text-slate-500 bg-slate-50 rounded-xl border border-slate-200">
-        Tidak ada transaksi yang cocok dengan filter.
+        Tidak ada transaksi yang cocok dengan kriteria pencarian/filter.
       </li>`;
     return;
   }
@@ -220,7 +249,8 @@ function renderExpenses() {
   items.forEach((item) => {
     const isIncome = item.type === "income";
     const li = document.createElement("li");
-    li.className = "flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition shadow-sm";
+    li.className =
+      "flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition shadow-sm";
 
     li.innerHTML = `
       <div class="flex items-center gap-3.5 min-w-0">
@@ -255,7 +285,7 @@ function renderExpenses() {
       </div>
     `;
 
-    // Event Edit
+    // Event tombol edit
     li.querySelector(".btn-edit-exp").addEventListener("click", () => {
       editingExpenseId = item.id;
       expEditTitle.value = item.title;
@@ -266,12 +296,11 @@ function renderExpenses() {
       openModal(modalEditExp);
     });
 
-    // Event Delete
+    // Event tombol hapus
     li.querySelector(".btn-delete-exp").addEventListener("click", () => {
       openDeleteModal(item.title, () => {
         expenses = expenses.filter((t) => t.id !== item.id);
         saveExpenses();
-        updateExpenseSummary();
         renderExpenses();
       });
     });
@@ -282,11 +311,14 @@ function renderExpenses() {
   updateExpenseSummary();
 }
 
-// Submit Form Tambah
+// Form Submit Tambah Transaksi
 expForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const amount = Number(expAmount.value);
-  if (amount <= 0) return;
+  if (amount <= 0) {
+    alert("Jumlah nominal harus lebih dari 0.");
+    return;
+  }
 
   expenses.push({
     id: crypto.randomUUID(),
@@ -304,7 +336,7 @@ expForm.addEventListener("submit", (e) => {
   renderExpenses();
 });
 
-// Submit Form Edit
+// Form Submit Edit Transaksi
 expEditForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const item = expenses.find((t) => t.id === editingExpenseId);
@@ -327,14 +359,14 @@ expSort.addEventListener("change", renderExpenses);
 
 
 /* ==========================================================================
-   3. BOOKMARK / LINK MANAGER
+   4. BOOKMARK / LINK MANAGER (3.2)
    ========================================================================== */
 
-const BM_STORAGE_KEY = "pabwe-p3-bookmarks";
+const BM_STORAGE_KEY = "pabwe-sk-bookmarks";
 let bookmarks = loadBookmarks();
 let editingBmId = null;
 
-// DOM Elements Bookmark
+// Elemen DOM Bookmark
 const bmForm = $("#bm-form");
 const bmTitle = $("#bm-title");
 const bmUrl = $("#bm-url");
@@ -345,7 +377,7 @@ const bmSort = $("#bm-sort");
 const bmList = $("#bm-list");
 const bmEmpty = $("#bm-empty");
 
-// Modal Elements Bookmark
+// Elemen Modal Edit Bookmark
 const modalEditBm = $("#modal-edit-bm");
 const bmEditForm = $("#bm-edit-form");
 const bmEditTitle = $("#bm-edit-title");
@@ -366,9 +398,10 @@ function saveBookmarks() {
   localStorage.setItem(BM_STORAGE_KEY, JSON.stringify(bookmarks));
 }
 
-function isValidURL(str) {
+/** Validasi format URL sederhana */
+function isValidURL(string) {
   try {
-    const url = new URL(str);
+    const url = new URL(string);
     return url.protocol === "http:" || url.protocol === "https:";
   } catch {
     return false;
@@ -379,6 +412,7 @@ function renderBookmarks() {
   const query = bmSearch.value.trim().toLowerCase();
   const sort = bmSort.value;
 
+  // Filter
   let items = bookmarks.filter((bm) => {
     return (
       bm.title.toLowerCase().includes(query) ||
@@ -387,6 +421,7 @@ function renderBookmarks() {
     );
   });
 
+  // Sorting
   items.sort((a, b) => {
     switch (sort) {
       case "oldest":
@@ -410,14 +445,15 @@ function renderBookmarks() {
   if (!noData && items.length === 0) {
     bmList.innerHTML = `
       <div class="sm:col-span-2 p-6 text-center text-sm text-slate-500 bg-slate-50 rounded-xl border border-slate-200">
-        Tidak ada bookmark yang sesuai dengan kueri pencarian.
+        Tidak ada bookmark yang sesuai dengan pencarian Anda.
       </div>`;
     return;
   }
 
   items.forEach((bm) => {
     const card = document.createElement("div");
-    card.className = "flex flex-col justify-between p-4 rounded-xl border border-slate-200 bg-white hover:shadow-sm transition";
+    card.className =
+      "flex flex-col justify-between p-4 rounded-xl border border-slate-200 bg-white hover:shadow-sm transition";
 
     card.innerHTML = `
       <div>
@@ -434,19 +470,20 @@ function renderBookmarks() {
             </button>
           </div>
         </div>
+        <!-- Link membuka di tab baru -->
         <a href="${bm.url}" target="_blank" rel="noopener noreferrer" class="font-display font-bold text-slate-900 hover:text-indigo-600 transition flex items-center gap-1 group">
           <span class="truncate">${bm.title}</span>
           <i class="ti ti-external-link text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
         </a>
         <p class="text-xs text-slate-400 truncate mt-0.5">${bm.url}</p>
-        ${bm.notes ? `<p class="text-xs text-slate-600 mt-2 line-clamp-2 bg-slate-50 p-2 rounded-lg">${bm.notes}</p>` : ""}
+        ${bm.notes ? `<p class="text-xs text-slate-600 mt-2.5 bg-slate-50 p-2 rounded-lg">${bm.notes}</p>` : ""}
       </div>
-      <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-        <span>Ditambahkan: ${new Date(bm.createdAt).toLocaleDateString("id-ID")}</span>
+      <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-400">
+        Tersimpan: ${new Date(bm.createdAt).toLocaleDateString("id-ID")}
       </div>
     `;
 
-    // Event Ubah Bookmark
+    // Event Ubah
     card.querySelector(".btn-edit-bm").addEventListener("click", () => {
       editingBmId = bm.id;
       bmEditTitle.value = bm.title;
@@ -456,7 +493,7 @@ function renderBookmarks() {
       openModal(modalEditBm);
     });
 
-    // Event Hapus Bookmark
+    // Event Hapus
     card.querySelector(".btn-delete-bm").addEventListener("click", () => {
       openDeleteModal(bm.title, () => {
         bookmarks = bookmarks.filter((b) => b.id !== bm.id);
@@ -469,13 +506,13 @@ function renderBookmarks() {
   });
 }
 
-// Submit Tambah Bookmark
+// Form Submit Tambah Bookmark
 bmForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const url = bmUrl.value.trim();
 
   if (!isValidURL(url)) {
-    alert("Mohon masukkan format URL yang valid (diawali http:// atau https://)");
+    alert("Format URL tidak valid! Harap masukkan tautan yang diawali http:// atau https://");
     bmUrl.focus();
     return;
   }
@@ -494,13 +531,13 @@ bmForm.addEventListener("submit", (e) => {
   renderBookmarks();
 });
 
-// Submit Edit Bookmark
+// Form Submit Edit Bookmark
 bmEditForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const url = bmEditUrl.value.trim();
 
   if (!isValidURL(url)) {
-    alert("Mohon masukkan format URL yang valid (diawali http:// atau https://)");
+    alert("Format URL tidak valid! Harap masukkan tautan yang diawali http:// atau https://");
     bmEditUrl.focus();
     return;
   }
@@ -523,55 +560,51 @@ bmSort.addEventListener("change", renderBookmarks);
 
 
 /* ==========================================================================
-   4. KUIS INTERAKTIF (QUIZ APP)
+   5. KUIS INTERAKTIF (QUIZ APP - 3.3)
    ========================================================================== */
 
-const QUIZ_STORAGE_KEY = "pabwe-p3-quiz-high-score";
+const QUIZ_STORAGE_KEY = "pabwe-sk-quiz-highscore";
 
+// Dataset soal kuis pilihan ganda
 const QUIZ_DATA = [
   {
-    question: "Manakah method array JavaScript yang digunakan untuk membuat array baru berisi hasil pemanggilan fungsi pada setiap elemennya?",
-    options: ["forEach()", "map()", "filter()", "reduce()"],
+    question: "Manakah method array JavaScript yang digunakan untuk menyaring elemen berdasarkan kondisi tertentu?",
+    options: ["map()", "filter()", "forEach()", "reduce()"],
     answer: 1,
-    explanation: "map() memetakan setiap item ke nilai baru dan mengembalikan array baru dengan panjang yang sama.",
+    explanation: "filter() membuat array baru berisi elemen yang lolos dari kondisi callback pengujian.",
   },
   {
-    question: "Bagaimanakah cara menyimpan objek JavaScript ke dalam localStorage?",
-    options: [
-      "localStorage.setItem('key', obj)",
-      "localStorage.setItem('key', JSON.stringify(obj))",
-      "localStorage.setObject('key', obj)",
-      "JSON.save(localStorage, obj)",
-    ],
+    question: "Bagaimanakah cara mengubah string JSON menjadi objek JavaScript asli?",
+    options: ["JSON.stringify()", "JSON.parse()", "JSON.toObject()", "JSON.decode()"],
     answer: 1,
-    explanation: "localStorage hanya dapat menyimpan string. Oleh karena itu, kita harus melakukan JSON.stringify(obj).",
+    explanation: "JSON.parse() mengurai string format JSON kembali menjadi struktur objek/array JavaScript.",
   },
   {
-    question: "Manakah atribut link yang digunakan agar tautan terbuka di tab baru secara aman?",
+    question: "Atribut HTML apa yang digunakan pada elemen <a> untuk membuka halaman baru secara aman?",
     options: [
       'target="_blank" rel="noopener noreferrer"',
       'target="_new" rel="secure"',
-      'target="_self" rel="tab"',
-      'target="_blank" rel="follow"',
+      'target="_top" rel="follow"',
+      'target="_window" rel="external"',
     ],
     answer: 0,
-    explanation: 'target="_blank" membuka jendela baru, dan rel="noopener noreferrer" mencegah eksploitasi window.opener.',
+    explanation: 'target="_blank" membuka tab baru, sedangkan rel="noopener noreferrer" mengamankan window opener.',
   },
   {
-    question: "Keyword apa yang digunakan untuk mendeklarasikan variabel dengan scope blok yang nilainya tidak dapat di-reassign?",
-    options: ["var", "let", "const", "static"],
-    answer: 2,
-    explanation: "const bersifat block-scoped dan referensi nilainya tidak dapat diubah kembali (immutable assignment).",
+    question: "Manakah cara seleksi elemen DOM dengan JavaScript modern yang paling sering digunakan?",
+    options: ["document.getElementById", "document.querySelector", "document.getElementsByTagName", "document.findElement"],
+    answer: 1,
+    explanation: "document.querySelector menggunakan CSS selector dan fleksibel untuk mengambil elemen tunggal apa pun.",
   },
   {
-    question: "Event DOM apa yang dipicu saat formulir (form) diserahkan/dikirim oleh pengguna?",
-    options: ["change", "input", "submit", "send"],
+    question: "Di manakah data localStorage disimpan pada web browser?",
+    options: ["Di server cloud", "Di cookie sesi sementara", "Di penyimpanan lokal browser pengguna secara persisten", "Di database SQL"],
     answer: 2,
-    explanation: "Event 'submit' aktif saat tombol submit ditekan atau Enter ditekan di dalam input form.",
+    explanation: "localStorage menyimpan data dalam browser klien dan tetap ada meskipun halaman di-refresh / browser ditutup.",
   },
 ];
 
-// Quiz DOM Elements
+// Elemen DOM Quiz
 const quizViewStart = $("#quiz-view-start");
 const quizViewPlay = $("#quiz-view-play");
 const quizViewResult = $("#quiz-view-result");
@@ -591,11 +624,11 @@ const quizFinalHigh = $("#quiz-final-high");
 
 let currentQuestionIndex = 0;
 let quizScore = 0;
-let answered = false;
+let isAnswered = false;
 
 function getQuizHighScore() {
-  const v = localStorage.getItem(QUIZ_STORAGE_KEY);
-  return v !== null ? Number(v) : null;
+  const score = localStorage.getItem(QUIZ_STORAGE_KEY);
+  return score !== null ? Number(score) : null;
 }
 
 function updateHighScoreUI() {
@@ -613,10 +646,10 @@ function startQuiz() {
 }
 
 function renderQuestion() {
-  answered = false;
+  isAnswered = false;
   const q = QUIZ_DATA[currentQuestionIndex];
 
-  // Update UI Progress
+  // Update Tampilan Progres
   const progressPercent = ((currentQuestionIndex + 1) / QUIZ_DATA.length) * 100;
   quizProgressText.textContent = `Soal ${currentQuestionIndex + 1} dari ${QUIZ_DATA.length}`;
   quizProgressBar.style.width = `${progressPercent}%`;
@@ -628,7 +661,7 @@ function renderQuestion() {
   quizBtnNext.classList.add("hidden");
   quizOptions.innerHTML = "";
 
-  // Render opsi
+  // Render Pilihan Jawaban
   q.options.forEach((optText, index) => {
     const btn = document.createElement("button");
     btn.type = "button";
@@ -636,24 +669,24 @@ function renderQuestion() {
       "w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition text-sm font-medium flex items-center justify-between";
     btn.innerHTML = `<span>${optText}</span><i class="ti ti-circle text-slate-300"></i>`;
 
-    btn.addEventListener("click", () => handleSelectAnswer(index, btn));
+    btn.addEventListener("click", () => handleAnswerSelect(index, btn));
     quizOptions.appendChild(btn);
   });
 }
 
-function handleSelectAnswer(selectedIndex, selectedBtn) {
-  if (answered) return;
-  answered = true;
+function handleAnswerSelect(selectedIndex, selectedBtn) {
+  if (isAnswered) return;
+  isAnswered = true;
 
   const q = QUIZ_DATA[currentQuestionIndex];
   const isCorrect = selectedIndex === q.answer;
   const optionButtons = quizOptions.querySelectorAll("button");
 
-  // Nonaktifkan semua opsi
-  optionButtons.forEach((btn) => (btn.disabled = true));
+  // Kunci semua opsi agar tidak bisa diklik dua kali
+  optionButtons.forEach((b) => (b.disabled = true));
 
   if (isCorrect) {
-    quizScore += 20;
+    quizScore += 20; // 5 soal x 20 = 100
     quizScoreBadge.textContent = `Skor: ${quizScore}`;
     selectedBtn.className =
       "w-full text-left p-3.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 text-sm font-medium flex items-center justify-between";
@@ -666,7 +699,7 @@ function handleSelectAnswer(selectedIndex, selectedBtn) {
       "w-full text-left p-3.5 rounded-xl border border-rose-300 bg-rose-50 text-rose-900 text-sm font-medium flex items-center justify-between";
     selectedBtn.querySelector("i").className = "ti ti-circle-x-filled text-rose-600 text-lg";
 
-    // Highlight jawaban yang benar
+    // Tunjukkan jawaban yang benar
     const correctBtn = optionButtons[q.answer];
     correctBtn.className =
       "w-full text-left p-3.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 text-sm font-medium flex items-center justify-between";
@@ -705,11 +738,11 @@ function showQuizResult() {
   quizFinalHigh.textContent = getQuizHighScore();
 
   if (isNewRecord && quizScore > 0) {
-    quizResultMsg.innerHTML = "🎉 <strong>Luar biasa!</strong> Anda mencetak rekor skor tertinggi baru!";
+    quizResultMsg.innerHTML = "🎉 <strong>Hebat!</strong> Anda mencetak rekor skor tertinggi baru!";
   } else if (quizScore === 100) {
-    quizResultMsg.textContent = "Sempurna! Anda memahami materi dengan sangat baik.";
+    quizResultMsg.textContent = "Sempurna! Semua soal berhasil Anda jawab dengan benar.";
   } else {
-    quizResultMsg.textContent = "Kerja bagus! Terus latih pemahaman web Anda.";
+    quizResultMsg.textContent = "Kerja bagus! Latih terus pemahaman dasar pemrograman web Anda.";
   }
 
   updateHighScoreUI();
@@ -720,30 +753,7 @@ quizBtnRestart.addEventListener("click", startQuiz);
 
 
 /* ==========================================================================
-   5. MODAL KONFIRMASI HAPUS UNIVERSAL
-   ========================================================================== */
-
-const modalDelete = $("#modal-delete");
-const modalDeleteItemTitle = $("#modal-delete-item-title");
-const btnConfirmDelete = $("#btn-confirm-delete");
-let onConfirmDeleteCallback = null;
-
-function openDeleteModal(itemTitle, onConfirm) {
-  modalDeleteItemTitle.textContent = `"${itemTitle}"`;
-  onConfirmDeleteCallback = onConfirm;
-  openModal(modalDelete);
-}
-
-btnConfirmDelete.addEventListener("click", () => {
-  if (typeof onConfirmDeleteCallback === "function") {
-    onConfirmDeleteCallback();
-  }
-  closeModal(modalDelete);
-});
-
-
-/* ==========================================================================
-   6. INISIALISASI SAAT HALAMAN DIMUAT
+   6. INISIALISASI HALAMAN SAAT PERTAMA KALI DIBUKA
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
