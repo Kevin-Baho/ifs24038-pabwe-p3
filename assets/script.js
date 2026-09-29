@@ -102,32 +102,47 @@ const panels = {
 function switchTab(targetTab) {
   if (!panels[targetTab]) targetTab = "expense";
 
-  // Hentikan timer kuis jika pengguna berpindah tab
-  if (typeof stopQuizTimer === "function") stopQuizTimer();
+  // Hentikan timer kuis jika keluar dari tab kuis
+  if (targetTab !== "quiz" && typeof stopQuizTimer === "function") {
+    stopQuizTimer();
+  }
 
-  Object.entries(panels).forEach(([key, panel]) => {
-    panel.classList.toggle("hidden", key !== targetTab);
+  // Tampilkan panel yang dipilih, sembunyikan yang lain
+  Object.keys(panels).forEach((key) => {
+    if (key === targetTab) {
+      panels[key].classList.remove("hidden");
+    } else {
+      panels[key].classList.add("hidden");
+    }
   });
 
+  // Update style tombol tab aktif
   tabButtons.forEach((btn) => {
-    const isActive = btn.dataset.tab === targetTab;
-    btn.setAttribute("aria-selected", String(isActive));
-    btn.classList.toggle("bg-slate-900", isActive);
-    btn.classList.toggle("text-white", isActive);
-    btn.classList.toggle("shadow-md", isActive);
-    btn.classList.toggle("text-slate-700", !isActive);
-    btn.classList.toggle("hover:bg-slate-100", !isActive);
+    const isCurrent = btn.getAttribute("data-tab") === targetTab;
+    btn.setAttribute("aria-selected", isCurrent ? "true" : "false");
+    if (isCurrent) {
+      btn.classList.add("bg-slate-900", "text-white", "shadow-md");
+      btn.classList.remove("text-slate-700", "hover:bg-slate-100");
+    } else {
+      btn.classList.remove("bg-slate-900", "text-white", "shadow-md");
+      btn.classList.add("text-slate-700", "hover:bg-slate-100");
+    }
   });
+
+  // Render ulang data pada tab yang aktif
+  if (targetTab === "expense") renderExpenses();
+  if (targetTab === "bookmark") renderBookmarks();
 
   localStorage.setItem(TAB_STORAGE_KEY, targetTab);
 }
 
+// Event listener klik untuk tombol tab
 tabButtons.forEach((btn) => {
-  btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+  btn.addEventListener("click", () => {
+    const tabName = btn.getAttribute("data-tab");
+    switchTab(tabName);
+  });
 });
-
-const savedTab = localStorage.getItem(TAB_STORAGE_KEY) || "expense";
-switchTab(savedTab);
 
 
 /* ==========================================================================
@@ -267,10 +282,10 @@ function renderExpenses() {
           ${isIncome ? "+" : "-"} ${formatRupiah(item.amount)}
         </span>
         <div class="flex items-center gap-1">
-          <button type="button" class="btn-edit-exp p-1.5 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100" aria-label="Ubah transaksi ${item.title}">
+          <button type="button" class="btn-edit-exp p-1.5 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 cursor-pointer" aria-label="Ubah transaksi ${item.title}">
             <i class="ti ti-pencil" aria-hidden="true"></i>
           </button>
-          <button type="button" class="btn-delete-exp p-1.5 rounded-lg text-rose-700 hover:text-rose-900 hover:bg-rose-100" aria-label="Hapus transaksi ${item.title}">
+          <button type="button" class="btn-delete-exp p-1.5 rounded-lg text-rose-700 hover:text-rose-900 hover:bg-rose-100 cursor-pointer" aria-label="Hapus transaksi ${item.title}">
             <i class="ti ti-trash" aria-hidden="true"></i>
           </button>
         </div>
@@ -448,10 +463,10 @@ function renderBookmarks() {
             ${bm.category}
           </span>
           <div class="flex items-center gap-1">
-            <button type="button" class="btn-edit-bm p-1 rounded hover:bg-slate-100 text-slate-700 hover:text-slate-900" aria-label="Ubah bookmark ${bm.title}">
+            <button type="button" class="btn-edit-bm p-1 rounded hover:bg-slate-100 text-slate-700 hover:text-slate-900 cursor-pointer" aria-label="Ubah bookmark ${bm.title}">
               <i class="ti ti-pencil text-sm" aria-hidden="true"></i>
             </button>
-            <button type="button" class="btn-delete-bm p-1 rounded hover:bg-rose-100 text-rose-700 hover:text-rose-900" aria-label="Hapus bookmark ${bm.title}">
+            <button type="button" class="btn-delete-bm p-1 rounded hover:bg-rose-100 text-rose-700 hover:text-rose-900 cursor-pointer" aria-label="Hapus bookmark ${bm.title}">
               <i class="ti ti-trash text-sm" aria-hidden="true"></i>
             </button>
           </div>
@@ -704,7 +719,7 @@ function renderQuestion() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className =
-      "w-full text-left p-3.5 rounded-xl border border-slate-300 hover:border-slate-500 hover:bg-slate-50 transition text-sm font-bold text-slate-900 flex items-center justify-between";
+      "w-full text-left p-3.5 rounded-xl border border-slate-300 hover:border-slate-500 hover:bg-slate-50 transition text-sm font-bold text-slate-900 flex items-center justify-between cursor-pointer";
     btn.innerHTML = `<span>${optText}</span><i class="ti ti-circle text-slate-500" aria-hidden="true"></i>`;
 
     btn.addEventListener("click", () => handleAnswerSelect(index, btn));
@@ -793,11 +808,22 @@ quizBtnRestart.addEventListener("click", startQuiz);
 
 
 /* ==========================================================================
-   6. INISIALISASI HALAMAN SAAT DIMUAT
+   6. INISIALISASI HALAMAN OTOMATIS
    ========================================================================== */
 
-document.addEventListener("DOMContentLoaded", () => {
+function initializeApp() {
   renderExpenses();
   renderBookmarks();
   updateHighScoreUI();
-});
+
+  // Buka tab yang tersimpan di localStorage (default: expense)
+  const initialTab = localStorage.getItem(TAB_STORAGE_KEY) || "expense";
+  switchTab(initialTab);
+}
+
+// Jalankan inisialisasi tanpa terpengaruh timing browser
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeApp);
+} else {
+  initializeApp();
+}

@@ -51,7 +51,7 @@
     <!-- LANDMARK: HEADER -->
     <header class="mb-8">
       <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 text-sky-900 text-xs font-bold mb-2">
-        <i class="ti ti-apps"></i> Studi Kasus Praktikum 3
+        <i class="ti ti-apps" aria-hidden="true"></i> Studi Kasus Praktikum 3
       </div>
       <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
         Workspace & Dashboard Interaktif
@@ -60,8 +60,8 @@
         Kelola pengeluaran harian, tautan referensi web, dan uji pengetahuan web lewat kuis interaktif.
       </p>
 
-      <!-- NAVIGASI TAB (Role tablist + tab) -->
-      <nav class="flex gap-1.5 p-1.5 bg-white/95 backdrop-blur border border-slate-300 rounded-2xl shadow-sm mt-6" role="tablist" aria-label="Navigasi Menu Utama">
+      <!-- NAVIGASI TAB -->
+      <nav id="main-tab-nav" class="flex gap-1.5 p-1.5 bg-white/95 backdrop-blur border border-slate-300 rounded-2xl shadow-sm mt-6" role="tablist" aria-label="Navigasi Menu Utama">
         <button
           type="button"
           id="tab-btn-expense"
@@ -69,11 +69,11 @@
           aria-selected="true"
           aria-controls="panel-expense"
           data-tab="expense"
-          class="tab-btn flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-bold transition"
+          class="tab-btn flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
         >
-          <i class="ti ti-wallet text-lg" aria-hidden="true"></i>
-          <span class="hidden sm:inline">Pengeluaran Harian</span>
-          <span class="sm:hidden">Expense</span>
+          <i class="ti ti-wallet text-lg pointer-events-none" aria-hidden="true"></i>
+          <span class="hidden sm:inline pointer-events-none">Pengeluaran Harian</span>
+          <span class="sm:hidden pointer-events-none">Expense</span>
         </button>
         <button
           type="button"
@@ -82,11 +82,11 @@
           aria-selected="false"
           aria-controls="panel-bookmark"
           data-tab="bookmark"
-          class="tab-btn flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-bold transition"
+          class="tab-btn flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
         >
-          <i class="ti ti-bookmarks text-lg" aria-hidden="true"></i>
-          <span class="hidden sm:inline">Bookmark Manager</span>
-          <span class="sm:hidden">Bookmark</span>
+          <i class="ti ti-bookmarks text-lg pointer-events-none" aria-hidden="true"></i>
+          <span class="hidden sm:inline pointer-events-none">Bookmark Manager</span>
+          <span class="sm:hidden pointer-events-none">Bookmark</span>
         </button>
         <button
           type="button"
@@ -95,11 +95,11 @@
           aria-selected="false"
           aria-controls="panel-quiz"
           data-tab="quiz"
-          class="tab-btn flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-bold transition"
+          class="tab-btn flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-bold transition cursor-pointer"
         >
-          <i class="ti ti-brain text-lg" aria-hidden="true"></i>
-          <span class="hidden sm:inline">Kuis Interaktif</span>
-          <span class="sm:hidden">Kuis</span>
+          <i class="ti ti-brain text-lg pointer-events-none" aria-hidden="true"></i>
+          <span class="hidden sm:inline pointer-events-none">Kuis Interaktif</span>
+          <span class="sm:hidden pointer-events-none">Kuis</span>
         </button>
       </nav>
     </header>
@@ -391,7 +391,7 @@
               <button
                 type="button"
                 id="quiz-btn-start"
-                class="inline-flex items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-3 shadow transition"
+                class="inline-flex items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-3 shadow transition cursor-pointer"
               >
                 <i class="ti ti-player-play" aria-hidden="true"></i> Mulai Kuis Sekarang
               </button>
@@ -431,7 +431,7 @@
               <button
                 type="button"
                 id="quiz-btn-next"
-                class="hidden inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold px-5 py-2.5 transition shadow"
+                class="hidden inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold px-5 py-2.5 transition shadow cursor-pointer"
               >
                 <span>Lanjut Soal Berikutnya</span>
                 <i class="ti ti-arrow-right" aria-hidden="true"></i>
@@ -461,7 +461,7 @@
             <button
               type="button"
               id="quiz-btn-restart"
-              class="inline-flex items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-3 transition shadow"
+              class="inline-flex items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-3 transition shadow cursor-pointer"
             >
               <i class="ti ti-rotate-clockwise" aria-hidden="true"></i> Ulangi Kuis
             </button>
