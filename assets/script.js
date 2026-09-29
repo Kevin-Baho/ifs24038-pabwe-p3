@@ -115,7 +115,7 @@ function switchTab(targetTab) {
     btn.classList.toggle("bg-slate-900", isActive);
     btn.classList.toggle("text-white", isActive);
     btn.classList.toggle("shadow-md", isActive);
-    btn.classList.toggle("text-slate-600", !isActive);
+    btn.classList.toggle("text-slate-700", !isActive);
     btn.classList.toggle("hover:bg-slate-100", !isActive);
   });
 
@@ -193,7 +193,7 @@ function updateExpenseSummary() {
   expBalance.textContent = formatRupiah(balance);
 
   expBalance.className = `font-display text-2xl font-bold ${
-    balance < 0 ? "text-rose-600" : "text-slate-900"
+    balance < 0 ? "text-rose-800" : "text-slate-900"
   }`;
 }
 
@@ -232,7 +232,7 @@ function renderExpenses() {
 
   if (!noData && items.length === 0) {
     expList.innerHTML = `
-      <li class="p-4 text-center text-sm text-slate-500 bg-slate-50 rounded-xl border border-slate-200">
+      <li class="p-4 text-center text-sm text-slate-700 bg-slate-100 rounded-xl border border-slate-300 font-medium">
         Tidak ada transaksi yang cocok dengan kriteria filter.
       </li>`;
     return;
@@ -242,19 +242,19 @@ function renderExpenses() {
     const isIncome = item.type === "income";
     const li = document.createElement("li");
     li.className =
-      "flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition shadow-sm";
+      "flex items-center justify-between p-4 rounded-xl border border-slate-300 bg-white hover:border-slate-400 transition shadow-sm";
 
     li.innerHTML = `
       <div class="flex items-center gap-3.5 min-w-0">
         <div class="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center ${
-          isIncome ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+          isIncome ? "bg-emerald-100 text-emerald-900" : "bg-rose-100 text-rose-900"
         }">
-          <i class="ti ${isIncome ? "ti-arrow-down-left" : "ti-arrow-up-right"} text-xl"></i>
+          <i class="ti ${isIncome ? "ti-arrow-down-left" : "ti-arrow-up-right"} text-xl" aria-hidden="true"></i>
         </div>
         <div class="min-w-0">
-          <p class="font-medium text-slate-900 truncate text-sm sm:text-base">${item.title}</p>
-          <div class="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
-            <span class="px-2 py-0.5 rounded bg-slate-100 font-medium text-slate-600">${item.category}</span>
+          <p class="font-bold text-slate-900 truncate text-sm sm:text-base">${item.title}</p>
+          <div class="flex items-center gap-2 mt-0.5 text-xs text-slate-600 font-medium">
+            <span class="px-2 py-0.5 rounded bg-slate-100 font-bold text-slate-800">${item.category}</span>
             <span>•</span>
             <span>${item.date}</span>
           </div>
@@ -262,16 +262,16 @@ function renderExpenses() {
       </div>
       <div class="flex items-center gap-3 shrink-0">
         <span class="font-display font-bold text-sm sm:text-base ${
-          isIncome ? "text-emerald-600" : "text-rose-600"
+          isIncome ? "text-emerald-800" : "text-rose-800"
         }">
           ${isIncome ? "+" : "-"} ${formatRupiah(item.amount)}
         </span>
         <div class="flex items-center gap-1">
-          <button type="button" class="btn-edit-exp p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100" title="Ubah">
-            <i class="ti ti-pencil"></i>
+          <button type="button" class="btn-edit-exp p-1.5 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100" aria-label="Ubah transaksi ${item.title}">
+            <i class="ti ti-pencil" aria-hidden="true"></i>
           </button>
-          <button type="button" class="btn-delete-exp p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50" title="Hapus">
-            <i class="ti ti-trash"></i>
+          <button type="button" class="btn-delete-exp p-1.5 rounded-lg text-rose-700 hover:text-rose-900 hover:bg-rose-100" aria-label="Hapus transaksi ${item.title}">
+            <i class="ti ti-trash" aria-hidden="true"></i>
           </button>
         </div>
       </div>
@@ -430,7 +430,7 @@ function renderBookmarks() {
 
   if (!noData && items.length === 0) {
     bmList.innerHTML = `
-      <div class="sm:col-span-2 p-6 text-center text-sm text-slate-500 bg-slate-50 rounded-xl border border-slate-200">
+      <div class="sm:col-span-2 p-6 text-center text-sm text-slate-700 bg-slate-100 rounded-xl border border-slate-300 font-medium">
         Tidak ada bookmark yang sesuai pencarian.
       </div>`;
     return;
@@ -439,31 +439,31 @@ function renderBookmarks() {
   items.forEach((bm) => {
     const card = document.createElement("div");
     card.className =
-      "flex flex-col justify-between p-4 rounded-xl border border-slate-200 bg-white hover:shadow-sm transition";
+      "flex flex-col justify-between p-4 rounded-xl border border-slate-300 bg-white hover:shadow-sm transition";
 
     card.innerHTML = `
       <div>
         <div class="flex items-start justify-between gap-2 mb-2">
-          <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-semibold">
+          <span class="px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-900 text-xs font-bold">
             ${bm.category}
           </span>
           <div class="flex items-center gap-1">
-            <button type="button" class="btn-edit-bm p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700" title="Ubah">
-              <i class="ti ti-pencil text-sm"></i>
+            <button type="button" class="btn-edit-bm p-1 rounded hover:bg-slate-100 text-slate-700 hover:text-slate-900" aria-label="Ubah bookmark ${bm.title}">
+              <i class="ti ti-pencil text-sm" aria-hidden="true"></i>
             </button>
-            <button type="button" class="btn-delete-bm p-1 rounded hover:bg-rose-50 text-slate-400 hover:text-rose-600" title="Hapus">
-              <i class="ti ti-trash text-sm"></i>
+            <button type="button" class="btn-delete-bm p-1 rounded hover:bg-rose-100 text-rose-700 hover:text-rose-900" aria-label="Hapus bookmark ${bm.title}">
+              <i class="ti ti-trash text-sm" aria-hidden="true"></i>
             </button>
           </div>
         </div>
-        <a href="${bm.url}" target="_blank" rel="noopener noreferrer" class="font-display font-bold text-slate-900 hover:text-indigo-600 transition flex items-center gap-1 group">
+        <a href="${bm.url}" target="_blank" rel="noopener noreferrer" class="font-display font-bold text-slate-900 hover:text-indigo-800 transition flex items-center gap-1 group">
           <span class="truncate">${bm.title}</span>
-          <i class="ti ti-external-link text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          <i class="ti ti-external-link text-xs opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
         </a>
-        <p class="text-xs text-slate-400 truncate mt-0.5">${bm.url}</p>
-        ${bm.notes ? `<p class="text-xs text-slate-600 mt-2.5 bg-slate-50 p-2 rounded-lg">${bm.notes}</p>` : ""}
+        <p class="text-xs text-slate-600 truncate mt-0.5 font-medium">${bm.url}</p>
+        ${bm.notes ? `<p class="text-xs text-slate-700 mt-2.5 bg-slate-50 p-2 rounded-lg border border-slate-200 font-normal">${bm.notes}</p>` : ""}
       </div>
-      <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-400">
+      <div class="mt-3 pt-2 border-t border-slate-200 text-[11px] text-slate-600 font-medium">
         Tersimpan: ${new Date(bm.createdAt).toLocaleDateString("id-ID")}
       </div>
     `;
@@ -545,7 +545,7 @@ bmSort.addEventListener("change", renderBookmarks);
    ========================================================================== */
 
 const QUIZ_STORAGE_KEY = "pabwe-sk-quiz-highscore";
-const QUESTION_DURATION = 30; // 30 detik
+const QUESTION_DURATION = 30;
 
 const QUIZ_DATA = [
   {
@@ -636,14 +636,14 @@ function startQuizTimer() {
   stopQuizTimer();
   timeLeft = QUESTION_DURATION;
   quizTimerCount.textContent = timeLeft;
-  quizTimerBadge.className = "px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1 transition";
+  quizTimerBadge.className = "px-2.5 py-1 rounded-full bg-slate-200 text-slate-900 font-bold text-xs flex items-center gap-1 transition";
 
   timerInterval = setInterval(() => {
     timeLeft--;
     quizTimerCount.textContent = timeLeft;
 
     if (timeLeft <= 10) {
-      quizTimerBadge.className = "px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 font-bold text-xs flex items-center gap-1 animate-pulse transition";
+      quizTimerBadge.className = "px-2.5 py-1 rounded-full bg-rose-200 text-rose-950 font-bold text-xs flex items-center gap-1 animate-pulse transition";
     }
 
     if (timeLeft <= 0) {
@@ -661,18 +661,15 @@ function handleTimeOut() {
   const q = QUIZ_DATA[currentQuestionIndex];
   const optionButtons = quizOptions.querySelectorAll("button");
 
-  // Kunci semua tombol
   optionButtons.forEach((b) => (b.disabled = true));
 
-  // Tunjukkan jawaban yang benar dengan warna hijau
   const correctBtn = optionButtons[q.answer];
   correctBtn.className =
-    "w-full text-left p-3.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 text-sm font-medium flex items-center justify-between";
-  correctBtn.querySelector("i").className = "ti ti-circle-check text-emerald-600 text-lg";
+    "w-full text-left p-3.5 rounded-xl border border-emerald-500 bg-emerald-50 text-emerald-950 text-sm font-bold flex items-center justify-between";
+  correctBtn.querySelector("i").className = "ti ti-circle-check text-emerald-800 text-lg";
 
-  // Feedback waktu habis
-  quizFeedback.className = "rounded-xl border border-rose-200 bg-rose-50 text-rose-800 p-4 text-sm mb-4";
-  quizFeedback.innerHTML = `<strong>Waktu Habis! ⏰</strong> Jawaban yang benar adalah: <em>"${q.options[q.answer]}"</em>. <br><span class="text-xs text-rose-600">${q.explanation}</span>`;
+  quizFeedback.className = "rounded-xl border border-rose-400 bg-rose-50 text-rose-950 p-4 text-sm mb-4 font-medium";
+  quizFeedback.innerHTML = `<strong>Waktu Habis! ⏰</strong> Jawaban yang benar adalah: <em>"${q.options[q.answer]}"</em>. <br><span class="text-xs text-rose-900">${q.explanation}</span>`;
   
   quizFeedback.classList.remove("hidden");
   quizBtnNext.classList.remove("hidden");
@@ -691,10 +688,10 @@ function renderQuestion() {
   isAnswered = false;
   const q = QUIZ_DATA[currentQuestionIndex];
 
-  // Update Progress Bar & Counter
   const progressPercent = ((currentQuestionIndex + 1) / QUIZ_DATA.length) * 100;
   quizProgressText.textContent = `Soal ${currentQuestionIndex + 1} dari ${QUIZ_DATA.length}`;
   quizProgressBar.style.width = `${progressPercent}%`;
+  quizProgressBar.parentElement.setAttribute("aria-valuenow", String(progressPercent));
   quizScoreBadge.textContent = `Skor: ${quizScore}`;
   quizQuestion.textContent = q.question;
 
@@ -703,26 +700,24 @@ function renderQuestion() {
   quizBtnNext.classList.add("hidden");
   quizOptions.innerHTML = "";
 
-  // Render opsi
   q.options.forEach((optText, index) => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className =
-      "w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition text-sm font-medium flex items-center justify-between";
-    btn.innerHTML = `<span>${optText}</span><i class="ti ti-circle text-slate-300"></i>`;
+      "w-full text-left p-3.5 rounded-xl border border-slate-300 hover:border-slate-500 hover:bg-slate-50 transition text-sm font-bold text-slate-900 flex items-center justify-between";
+    btn.innerHTML = `<span>${optText}</span><i class="ti ti-circle text-slate-500" aria-hidden="true"></i>`;
 
     btn.addEventListener("click", () => handleAnswerSelect(index, btn));
     quizOptions.appendChild(btn);
   });
 
-  // Mulai timer soal
   startQuizTimer();
 }
 
 function handleAnswerSelect(selectedIndex, selectedBtn) {
   if (isAnswered) return;
   isAnswered = true;
-  stopQuizTimer(); // Hentikan timer jika pemain memilih
+  stopQuizTimer();
 
   const q = QUIZ_DATA[currentQuestionIndex];
   const isCorrect = selectedIndex === q.answer;
@@ -734,22 +729,22 @@ function handleAnswerSelect(selectedIndex, selectedBtn) {
     quizScore += 20;
     quizScoreBadge.textContent = `Skor: ${quizScore}`;
     selectedBtn.className =
-      "w-full text-left p-3.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 text-sm font-medium flex items-center justify-between";
-    selectedBtn.querySelector("i").className = "ti ti-circle-check-filled text-emerald-600 text-lg";
+      "w-full text-left p-3.5 rounded-xl border border-emerald-500 bg-emerald-50 text-emerald-950 text-sm font-bold flex items-center justify-between";
+    selectedBtn.querySelector("i").className = "ti ti-circle-check-filled text-emerald-800 text-lg";
 
-    quizFeedback.className = "rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 p-4 text-sm mb-4";
+    quizFeedback.className = "rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-950 p-4 text-sm mb-4 font-medium";
     quizFeedback.innerHTML = `<strong>Benar!</strong> ${q.explanation}`;
   } else {
     selectedBtn.className =
-      "w-full text-left p-3.5 rounded-xl border border-rose-300 bg-rose-50 text-rose-900 text-sm font-medium flex items-center justify-between";
-    selectedBtn.querySelector("i").className = "ti ti-circle-x-filled text-rose-600 text-lg";
+      "w-full text-left p-3.5 rounded-xl border border-rose-500 bg-rose-50 text-rose-950 text-sm font-bold flex items-center justify-between";
+    selectedBtn.querySelector("i").className = "ti ti-circle-x-filled text-rose-800 text-lg";
 
     const correctBtn = optionButtons[q.answer];
     correctBtn.className =
-      "w-full text-left p-3.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 text-sm font-medium flex items-center justify-between";
-    correctBtn.querySelector("i").className = "ti ti-circle-check text-emerald-600 text-lg";
+      "w-full text-left p-3.5 rounded-xl border border-emerald-500 bg-emerald-50 text-emerald-950 text-sm font-bold flex items-center justify-between";
+    correctBtn.querySelector("i").className = "ti ti-circle-check text-emerald-800 text-lg";
 
-    quizFeedback.className = "rounded-xl border border-rose-200 bg-rose-50 text-rose-800 p-4 text-sm mb-4";
+    quizFeedback.className = "rounded-xl border border-rose-300 bg-rose-50 text-rose-950 p-4 text-sm mb-4 font-medium";
     quizFeedback.innerHTML = `<strong>Kurang tepat.</strong> ${q.explanation}`;
   }
 

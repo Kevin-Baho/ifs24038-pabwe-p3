@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Aplikasi Web Terpadu Praktikum 3 PABWE: Catatan Pengeluaran Harian, Bookmark Manager, dan Kuis Interaktif." />
   <title>Studi Kasus — Praktikum 3 PABWE</title>
 
   <!-- Tailwind CSS CDN -->
@@ -43,400 +44,474 @@
     }
   </style>
 </head>
-<body class="font-sans text-slate-800 min-h-screen antialiased">
-  <div class="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+<body class="font-sans text-slate-900 min-h-screen antialiased flex flex-col justify-between">
+  
+  <div class="max-w-4xl w-full mx-auto px-4 py-8 sm:py-12 flex-1">
     
-    <!-- HEADER -->
+    <!-- LANDMARK: HEADER -->
     <header class="mb-8">
-      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-semibold mb-2">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 text-sky-900 text-xs font-bold mb-2">
         <i class="ti ti-apps"></i> Studi Kasus Praktikum 3
       </div>
       <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
         Workspace & Dashboard Interaktif
       </h1>
-      <p class="mt-2 text-slate-600 text-sm sm:text-base">
+      <p class="mt-2 text-slate-700 text-sm sm:text-base font-normal">
         Kelola pengeluaran harian, tautan referensi web, dan uji pengetahuan web lewat kuis interaktif.
       </p>
+
+      <!-- NAVIGASI TAB (Role tablist + tab) -->
+      <nav class="flex gap-1.5 p-1.5 bg-white/95 backdrop-blur border border-slate-300 rounded-2xl shadow-sm mt-6" role="tablist" aria-label="Navigasi Menu Utama">
+        <button
+          type="button"
+          id="tab-btn-expense"
+          role="tab"
+          aria-selected="true"
+          aria-controls="panel-expense"
+          data-tab="expense"
+          class="tab-btn flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-bold transition"
+        >
+          <i class="ti ti-wallet text-lg" aria-hidden="true"></i>
+          <span class="hidden sm:inline">Pengeluaran Harian</span>
+          <span class="sm:hidden">Expense</span>
+        </button>
+        <button
+          type="button"
+          id="tab-btn-bookmark"
+          role="tab"
+          aria-selected="false"
+          aria-controls="panel-bookmark"
+          data-tab="bookmark"
+          class="tab-btn flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-bold transition"
+        >
+          <i class="ti ti-bookmarks text-lg" aria-hidden="true"></i>
+          <span class="hidden sm:inline">Bookmark Manager</span>
+          <span class="sm:hidden">Bookmark</span>
+        </button>
+        <button
+          type="button"
+          id="tab-btn-quiz"
+          role="tab"
+          aria-selected="false"
+          aria-controls="panel-quiz"
+          data-tab="quiz"
+          class="tab-btn flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-bold transition"
+        >
+          <i class="ti ti-brain text-lg" aria-hidden="true"></i>
+          <span class="hidden sm:inline">Kuis Interaktif</span>
+          <span class="sm:hidden">Kuis</span>
+        </button>
+      </nav>
     </header>
 
-    <!-- NAVIGASI TAB -->
-    <nav class="flex gap-1.5 p-1.5 bg-white/90 backdrop-blur border border-slate-200 rounded-2xl shadow-sm mb-8" role="tablist">
-      <button
-        type="button"
-        data-tab="expense"
-        class="tab-btn flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-semibold transition"
-      >
-        <i class="ti ti-wallet text-lg"></i>
-        <span class="hidden sm:inline">Pengeluaran Harian</span>
-        <span class="sm:hidden">Expense</span>
-      </button>
-      <button
-        type="button"
-        data-tab="bookmark"
-        class="tab-btn flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-semibold transition"
-      >
-        <i class="ti ti-bookmarks text-lg"></i>
-        <span class="hidden sm:inline">Bookmark Manager</span>
-        <span class="sm:hidden">Bookmark</span>
-      </button>
-      <button
-        type="button"
-        data-tab="quiz"
-        class="tab-btn flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-semibold transition"
-      >
-        <i class="ti ti-brain text-lg"></i>
-        <span class="hidden sm:inline">Kuis Interaktif</span>
-        <span class="sm:hidden">Kuis</span>
-      </button>
-    </nav>
-
-    <!-- ================= 3.1 EXPENSE TRACKER ================= -->
-    <section id="panel-expense" class="tab-panel space-y-6">
-      <!-- Ringkasan Saldo -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <div class="flex items-center justify-between text-slate-500 mb-2">
-            <span class="text-xs font-semibold uppercase tracking-wider">Total Pemasukan</span>
-            <div class="p-2 rounded-lg bg-emerald-50 text-emerald-600"><i class="ti ti-arrow-down-left text-lg"></i></div>
+    <!-- LANDMARK: MAIN -->
+    <main id="main-content">
+      
+      <!-- ================= 3.1 EXPENSE TRACKER ================= -->
+      <section id="panel-expense" class="tab-panel space-y-6" role="tabpanel" aria-labelledby="tab-btn-expense">
+        <!-- Ringkasan Saldo -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-white border border-slate-300 rounded-2xl p-5 shadow-sm">
+            <div class="flex items-center justify-between text-slate-700 mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider">Total Pemasukan</span>
+              <div class="p-2 rounded-lg bg-emerald-100 text-emerald-900"><i class="ti ti-arrow-down-left text-lg" aria-hidden="true"></i></div>
+            </div>
+            <p id="exp-total-income" class="font-display text-2xl font-bold text-emerald-800">Rp 0</p>
           </div>
-          <p id="exp-total-income" class="font-display text-2xl font-bold text-emerald-600">Rp 0</p>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <div class="flex items-center justify-between text-slate-500 mb-2">
-            <span class="text-xs font-semibold uppercase tracking-wider">Total Pengeluaran</span>
-            <div class="p-2 rounded-lg bg-rose-50 text-rose-600"><i class="ti ti-arrow-up-right text-lg"></i></div>
+          <div class="bg-white border border-slate-300 rounded-2xl p-5 shadow-sm">
+            <div class="flex items-center justify-between text-slate-700 mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider">Total Pengeluaran</span>
+              <div class="p-2 rounded-lg bg-rose-100 text-rose-900"><i class="ti ti-arrow-up-right text-lg" aria-hidden="true"></i></div>
+            </div>
+            <p id="exp-total-expense" class="font-display text-2xl font-bold text-rose-800">Rp 0</p>
           </div>
-          <p id="exp-total-expense" class="font-display text-2xl font-bold text-rose-600">Rp 0</p>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <div class="flex items-center justify-between text-slate-500 mb-2">
-            <span class="text-xs font-semibold uppercase tracking-wider">Sisa Saldo</span>
-            <div class="p-2 rounded-lg bg-sky-50 text-sky-600"><i class="ti ti-scale text-lg"></i></div>
+          <div class="bg-white border border-slate-300 rounded-2xl p-5 shadow-sm">
+            <div class="flex items-center justify-between text-slate-700 mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider">Sisa Saldo</span>
+              <div class="p-2 rounded-lg bg-sky-100 text-sky-900"><i class="ti ti-scale text-lg" aria-hidden="true"></i></div>
+            </div>
+            <p id="exp-balance" class="font-display text-2xl font-bold text-slate-900">Rp 0</p>
           </div>
-          <p id="exp-balance" class="font-display text-2xl font-bold text-slate-900">Rp 0</p>
-        </div>
-      </div>
-
-      <!-- Card Transaksi -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm">
-        <h2 class="font-display text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-          <i class="ti ti-plus-circle text-sky-600"></i> Catat Transaksi Baru
-        </h2>
-
-        <!-- Form Tambah Transaksi -->
-        <form id="exp-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
-          <input
-            type="text"
-            id="exp-title"
-            placeholder="Deskripsi transaksi..."
-            required
-            class="lg:col-span-2 rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-          />
-          <input
-            type="number"
-            id="exp-amount"
-            placeholder="Nominal (Rp)..."
-            min="1"
-            required
-            class="rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-          />
-          <select
-            id="exp-type"
-            class="rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-          >
-            <option value="expense">Pengeluaran</option>
-            <option value="income">Pemasukan</option>
-          </select>
-          <select
-            id="exp-category"
-            class="rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-          >
-            <option value="Makanan">Makanan</option>
-            <option value="Transportasi">Transportasi</option>
-            <option value="Pendidikan">Pendidikan</option>
-            <option value="Gaji / Uang Saku">Gaji / Uang Saku</option>
-            <option value="Hiburan">Hiburan</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
-          <input
-            type="date"
-            id="exp-date"
-            required
-            class="lg:col-span-2 rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-          />
-          <button
-            type="submit"
-            class="lg:col-span-3 inline-flex items-center justify-center gap-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2.5 transition shadow"
-          >
-            <i class="ti ti-plus"></i> Simpan Transaksi
-          </button>
-        </form>
-
-        <hr class="border-slate-100 my-6" />
-
-        <!-- Filter & Search -->
-        <div class="flex flex-col sm:flex-row gap-3 mb-5">
-          <div class="relative flex-1">
-            <i class="ti ti-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-            <input
-              type="search"
-              id="exp-search"
-              placeholder="Cari transaksi berdasarkan judul / kategori..."
-              class="w-full rounded-xl border border-slate-300 pl-10 pr-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-            />
-          </div>
-          <select
-            id="exp-filter-type"
-            class="rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-          >
-            <option value="all">Semua Tipe</option>
-            <option value="income">Hanya Pemasukan</option>
-            <option value="expense">Hanya Pengeluaran</option>
-          </select>
-          <select
-            id="exp-sort"
-            class="rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-          >
-            <option value="newest">Tanggal Terbaru</option>
-            <option value="oldest">Tanggal Terlama</option>
-            <option value="amount-desc">Nominal Tertinggi</option>
-            <option value="amount-asc">Nominal Terendah</option>
-          </select>
         </div>
 
-        <!-- Empty State -->
-        <div
-          id="exp-empty"
-          class="hidden rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center"
-        >
-          <i class="ti ti-receipt-off text-3xl text-slate-400 mb-2"></i>
-          <p class="text-sm font-medium text-slate-600">Belum ada transaksi yang dicatat.</p>
-        </div>
+        <!-- Card Transaksi -->
+        <div class="bg-white border border-slate-300 rounded-2xl p-5 sm:p-6 shadow-sm">
+          <h2 class="font-display text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <i class="ti ti-plus-circle text-sky-700" aria-hidden="true"></i> Catat Transaksi Baru
+          </h2>
 
-        <!-- List Transaksi -->
-        <ul id="exp-list" class="space-y-2.5"></ul>
-      </div>
-    </section>
+          <!-- Form Tambah Transaksi -->
+          <form id="exp-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+            <div class="lg:col-span-2">
+              <label for="exp-title" class="block text-xs font-bold text-slate-800 mb-1">Deskripsi Transaksi</label>
+              <input
+                type="text"
+                id="exp-title"
+                placeholder="Contoh: Makan Siang"
+                required
+                class="w-full rounded-xl border border-slate-400 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-600"
+              />
+            </div>
+            <div>
+              <label for="exp-amount" class="block text-xs font-bold text-slate-800 mb-1">Jumlah (Rp)</label>
+              <input
+                type="number"
+                id="exp-amount"
+                placeholder="Nominal..."
+                min="1"
+                required
+                class="w-full rounded-xl border border-slate-400 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-600"
+              />
+            </div>
+            <div>
+              <label for="exp-type" class="block text-xs font-bold text-slate-800 mb-1">Tipe Transaksi</label>
+              <select
+                id="exp-type"
+                aria-label="Pilih Tipe Transaksi"
+                class="w-full rounded-xl border border-slate-400 px-3 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-600"
+              >
+                <option value="expense">Pengeluaran</option>
+                <option value="income">Pemasukan</option>
+              </select>
+            </div>
+            <div>
+              <label for="exp-category" class="block text-xs font-bold text-slate-800 mb-1">Kategori</label>
+              <select
+                id="exp-category"
+                aria-label="Pilih Kategori Transaksi"
+                class="w-full rounded-xl border border-slate-400 px-3 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-600"
+              >
+                <option value="Makanan">Makanan</option>
+                <option value="Transportasi">Transportasi</option>
+                <option value="Pendidikan">Pendidikan</option>
+                <option value="Gaji / Uang Saku">Gaji / Uang Saku</option>
+                <option value="Hiburan">Hiburan</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+            <div class="lg:col-span-2">
+              <label for="exp-date" class="block text-xs font-bold text-slate-800 mb-1">Tanggal</label>
+              <input
+                type="date"
+                id="exp-date"
+                required
+                class="w-full rounded-xl border border-slate-400 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-600"
+              />
+            </div>
+            <div class="lg:col-span-3 flex items-end">
+              <button
+                type="submit"
+                class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-sky-700 hover:bg-sky-800 text-white text-sm font-bold px-4 py-2.5 transition shadow"
+              >
+                <i class="ti ti-plus" aria-hidden="true"></i> Simpan Transaksi
+              </button>
+            </div>
+          </form>
 
-    <!-- ================= 3.2 BOOKMARK MANAGER ================= -->
-    <section id="panel-bookmark" class="tab-panel hidden space-y-6">
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm">
-        <h2 class="font-display text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-          <i class="ti ti-link text-indigo-600"></i> Tambah Bookmark Baru
-        </h2>
+          <hr class="border-slate-200 my-6" />
 
-        <!-- Form Tambah Bookmark -->
-        <form id="bm-form" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-          <input
-            type="text"
-            id="bm-title"
-            placeholder="Judul / Nama situs web..."
-            required
-            class="rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          <input
-            type="url"
-            id="bm-url"
-            placeholder="URL (contoh: https://google.com)..."
-            required
-            class="rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          <input
-            type="text"
-            id="bm-category"
-            placeholder="Tag / Kategori (contoh: Kuliah, Belajar)..."
-            required
-            class="rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          <input
-            type="text"
-            id="bm-notes"
-            placeholder="Catatan singkat (opsional)..."
-            class="rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          <button
-            type="submit"
-            class="sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 transition shadow"
+          <!-- Filter & Search -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+            <div>
+              <label for="exp-search" class="block text-xs font-bold text-slate-800 mb-1">Cari Transaksi</label>
+              <div class="relative">
+                <i class="ti ti-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600" aria-hidden="true"></i>
+                <input
+                  type="search"
+                  id="exp-search"
+                  placeholder="Ketik kata kunci..."
+                  class="w-full rounded-xl border border-slate-400 pl-10 pr-3.5 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-600"
+                />
+              </div>
+            </div>
+            <div>
+              <label for="exp-filter-type" class="block text-xs font-bold text-slate-800 mb-1">Filter Berdasarkan Tipe</label>
+              <select
+                id="exp-filter-type"
+                aria-label="Filter berdasarkan tipe transaksi"
+                class="w-full rounded-xl border border-slate-400 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-600"
+              >
+                <option value="all">Semua Tipe</option>
+                <option value="income">Hanya Pemasukan</option>
+                <option value="expense">Hanya Pengeluaran</option>
+              </select>
+            </div>
+            <div>
+              <label for="exp-sort" class="block text-xs font-bold text-slate-800 mb-1">Urutkan Berdasarkan</label>
+              <select
+                id="exp-sort"
+                aria-label="Urutkan daftar transaksi"
+                class="w-full rounded-xl border border-slate-400 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-600"
+              >
+                <option value="newest">Tanggal Terbaru</option>
+                <option value="oldest">Tanggal Terlama</option>
+                <option value="amount-desc">Nominal Tertinggi</option>
+                <option value="amount-asc">Nominal Terendah</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div
+            id="exp-empty"
+            class="hidden rounded-2xl border border-dashed border-slate-400 bg-slate-50 p-8 text-center"
           >
-            <i class="ti ti-bookmark-plus"></i> Simpan Bookmark
-          </button>
-        </form>
-
-        <hr class="border-slate-100 my-6" />
-
-        <!-- Search & Sort -->
-        <div class="flex flex-col sm:flex-row gap-3 mb-5">
-          <div class="relative flex-1">
-            <i class="ti ti-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-            <input
-              type="search"
-              id="bm-search"
-              placeholder="Cari bookmark (nama, URL, atau tag)..."
-              class="w-full rounded-xl border border-slate-300 pl-10 pr-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+            <i class="ti ti-receipt-off text-3xl text-slate-600 mb-2" aria-hidden="true"></i>
+            <p class="text-sm font-bold text-slate-800">Belum ada transaksi yang dicatat.</p>
           </div>
-          <select
-            id="bm-sort"
-            class="rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+
+          <!-- List Transaksi -->
+          <ul id="exp-list" class="space-y-2.5"></ul>
+        </div>
+      </section>
+
+      <!-- ================= 3.2 BOOKMARK MANAGER ================= -->
+      <section id="panel-bookmark" class="tab-panel hidden space-y-6" role="tabpanel" aria-labelledby="tab-btn-bookmark">
+        <div class="bg-white border border-slate-300 rounded-2xl p-5 sm:p-6 shadow-sm">
+          <h2 class="font-display text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <i class="ti ti-link text-indigo-700" aria-hidden="true"></i> Tambah Bookmark Baru
+          </h2>
+
+          <!-- Form Tambah Bookmark -->
+          <form id="bm-form" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+            <div>
+              <label for="bm-title" class="block text-xs font-bold text-slate-800 mb-1">Nama / Judul Tautan</label>
+              <input
+                type="text"
+                id="bm-title"
+                placeholder="Contoh: Dokumentasi MDN"
+                required
+                class="w-full rounded-xl border border-slate-400 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              />
+            </div>
+            <div>
+              <label for="bm-url" class="block text-xs font-bold text-slate-800 mb-1">URL Web (http:// atau https://)</label>
+              <input
+                type="url"
+                id="bm-url"
+                placeholder="https://developer.mozilla.org"
+                required
+                class="w-full rounded-xl border border-slate-400 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              />
+            </div>
+            <div>
+              <label for="bm-category" class="block text-xs font-bold text-slate-800 mb-1">Kategori / Tag</label>
+              <input
+                type="text"
+                id="bm-category"
+                placeholder="Contoh: Belajar, Kuliah"
+                required
+                class="w-full rounded-xl border border-slate-400 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              />
+            </div>
+            <div>
+              <label for="bm-notes" class="block text-xs font-bold text-slate-800 mb-1">Catatan Tambahan (Opsional)</label>
+              <input
+                type="text"
+                id="bm-notes"
+                placeholder="Catatan singkat..."
+                class="w-full rounded-xl border border-slate-400 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              />
+            </div>
+            <div class="sm:col-span-2 mt-2">
+              <button
+                type="submit"
+                class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white text-sm font-bold px-4 py-2.5 transition shadow"
+              >
+                <i class="ti ti-bookmark-plus" aria-hidden="true"></i> Simpan Bookmark
+              </button>
+            </div>
+          </form>
+
+          <hr class="border-slate-200 my-6" />
+
+          <!-- Search & Sort Bookmark -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+            <div>
+              <label for="bm-search" class="block text-xs font-bold text-slate-800 mb-1">Cari Bookmark</label>
+              <div class="relative">
+                <i class="ti ti-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600" aria-hidden="true"></i>
+                <input
+                  type="search"
+                  id="bm-search"
+                  placeholder="Cari nama, url, atau tag..."
+                  class="w-full rounded-xl border border-slate-400 pl-10 pr-3.5 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                />
+              </div>
+            </div>
+            <div>
+              <label for="bm-sort" class="block text-xs font-bold text-slate-800 mb-1">Urutkan Bookmark</label>
+              <select
+                id="bm-sort"
+                aria-label="Urutkan bookmark"
+                class="w-full rounded-xl border border-slate-400 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              >
+                <option value="newest">Terbaru</option>
+                <option value="oldest">Terlama</option>
+                <option value="title-asc">Nama A–Z</option>
+                <option value="title-desc">Nama Z–A</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div
+            id="bm-empty"
+            class="hidden rounded-2xl border border-dashed border-slate-400 bg-slate-50 p-8 text-center"
           >
-            <option value="newest">Terbaru</option>
-            <option value="oldest">Terlama</option>
-            <option value="title-asc">Nama A–Z</option>
-            <option value="title-desc">Nama Z–A</option>
-          </select>
-        </div>
-
-        <!-- Empty State -->
-        <div
-          id="bm-empty"
-          class="hidden rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center"
-        >
-          <i class="ti ti-bookmark-off text-3xl text-slate-400 mb-2"></i>
-          <p class="text-sm font-medium text-slate-600">Belum ada tautan yang disimpan.</p>
-        </div>
-
-        <!-- List Bookmark -->
-        <div id="bm-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
-      </div>
-    </section>
-
-    <!-- ================= 3.3 KUIS INTERAKTIF ================= -->
-    <section id="panel-quiz" class="tab-panel hidden space-y-6">
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
-        
-        <!-- View 1: Menu Mulai Kuis -->
-        <div id="quiz-view-start" class="text-center py-6">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 mb-4">
-            <i class="ti ti-award text-3xl"></i>
-          </div>
-          <h2 class="font-display text-2xl font-bold text-slate-900 mb-2">Kuis Pemrograman Web</h2>
-          <p class="text-slate-600 text-sm max-w-md mx-auto mb-6">
-            Uji pemahaman JavaScript, DOM, dan Web Development dasar melalui 5 soal pilihan ganda. Waktu pengerjaan adalah <strong>30 detik</strong> per soal.
-          </p>
-
-          <div class="inline-block bg-slate-50 border border-slate-200 rounded-xl px-5 py-3 mb-6">
-            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Skor Tertinggi (High Score)</span>
-            <p id="quiz-high-score" class="font-display text-xl font-bold text-amber-600">—</p>
+            <i class="ti ti-bookmark-off text-3xl text-slate-600 mb-2" aria-hidden="true"></i>
+            <p class="text-sm font-bold text-slate-800">Belum ada tautan yang disimpan.</p>
           </div>
 
-          <div>
+          <!-- List Bookmark -->
+          <div id="bm-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
+        </div>
+      </section>
+
+      <!-- ================= 3.3 KUIS INTERAKTIF ================= -->
+      <section id="panel-quiz" class="tab-panel hidden space-y-6" role="tabpanel" aria-labelledby="tab-btn-quiz">
+        <div class="bg-white border border-slate-300 rounded-2xl p-6 sm:p-8 shadow-sm">
+          
+          <!-- View 1: Menu Mulai Kuis -->
+          <div id="quiz-view-start" class="text-center py-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-100 text-amber-900 mb-4">
+              <i class="ti ti-award text-3xl" aria-hidden="true"></i>
+            </div>
+            <h2 class="font-display text-2xl font-bold text-slate-900 mb-2">Kuis Pemrograman Web</h2>
+            <p class="text-slate-700 text-sm max-w-md mx-auto mb-6 font-normal">
+              Uji pemahaman JavaScript, DOM, dan Web Development dasar. Waktu pengerjaan adalah <strong>30 detik</strong> per soal.
+            </p>
+
+            <div class="inline-block bg-slate-50 border border-slate-300 rounded-xl px-5 py-3 mb-6">
+              <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Skor Tertinggi (High Score)</span>
+              <p id="quiz-high-score" class="font-display text-xl font-bold text-amber-900">—</p>
+            </div>
+
+            <div>
+              <button
+                type="button"
+                id="quiz-btn-start"
+                class="inline-flex items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-3 shadow transition"
+              >
+                <i class="ti ti-player-play" aria-hidden="true"></i> Mulai Kuis Sekarang
+              </button>
+            </div>
+          </div>
+
+          <!-- View 2: Tampilan Soal & Opsi -->
+          <div id="quiz-view-play" class="hidden">
+            <div class="flex items-center justify-between mb-3 text-sm flex-wrap gap-2">
+              <span id="quiz-progress-text" class="font-bold text-slate-800">Soal 1 dari 5</span>
+              
+              <div class="flex items-center gap-2">
+                <!-- BADGE TIMER 30 DETIK -->
+                <span id="quiz-timer-badge" class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-900 font-bold text-xs flex items-center gap-1 transition">
+                  <i class="ti ti-clock" aria-hidden="true"></i>
+                  <span id="quiz-timer-count">30</span>s
+                </span>
+                <span id="quiz-score-badge" class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-900 font-bold text-xs">Skor: 0</span>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 h-2.5 rounded-full mb-6 overflow-hidden" role="progressbar" aria-label="Progress Soal Kuis" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+              <div id="quiz-progress-bar" class="bg-amber-600 h-full w-0 transition-all duration-300"></div>
+            </div>
+
+            <h3 id="quiz-question" class="font-display text-lg sm:text-xl font-bold text-slate-900 mb-5">
+              Pertanyaan kuis...
+            </h3>
+
+            <div id="quiz-options" class="space-y-2.5 mb-6"></div>
+
+            <!-- Feedback Box -->
+            <div id="quiz-feedback" class="hidden rounded-xl border p-4 text-sm mb-4"></div>
+
+            <div class="flex justify-end">
+              <button
+                type="button"
+                id="quiz-btn-next"
+                class="hidden inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold px-5 py-2.5 transition shadow"
+              >
+                <span>Lanjut Soal Berikutnya</span>
+                <i class="ti ti-arrow-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- View 3: Hasil Kuis -->
+          <div id="quiz-view-result" class="hidden text-center py-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-900 mb-4">
+              <i class="ti ti-trophy text-3xl" aria-hidden="true"></i>
+            </div>
+            <h2 class="font-display text-2xl font-bold text-slate-900 mb-2">Kuis Selesai!</h2>
+            <p id="quiz-result-message" class="text-slate-700 text-sm max-w-md mx-auto mb-6"></p>
+
+            <div class="grid grid-cols-2 gap-4 max-w-xs mx-auto mb-6">
+              <div class="bg-slate-50 border border-slate-300 rounded-xl p-4">
+                <span class="text-xs text-slate-700 font-bold">Skor Anda</span>
+                <p id="quiz-final-score" class="font-display text-3xl font-bold text-slate-900">0</p>
+              </div>
+              <div class="bg-amber-50 border border-amber-300 rounded-xl p-4">
+                <span class="text-xs text-amber-900 font-bold">Rekor Terbaik</span>
+                <p id="quiz-final-high" class="font-display text-3xl font-bold text-amber-900">0</p>
+              </div>
+            </div>
+
             <button
               type="button"
-              id="quiz-btn-start"
-              class="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-3 shadow transition"
+              id="quiz-btn-restart"
+              class="inline-flex items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-3 transition shadow"
             >
-              <i class="ti ti-player-play"></i> Mulai Kuis Sekarang
+              <i class="ti ti-rotate-clockwise" aria-hidden="true"></i> Ulangi Kuis
             </button>
           </div>
+
         </div>
+      </section>
+    </main>
 
-        <!-- View 2: Tampilan Soal & Opsi -->
-        <div id="quiz-view-play" class="hidden">
-          <div class="flex items-center justify-between mb-3 text-sm flex-wrap gap-2">
-            <span id="quiz-progress-text" class="font-semibold text-slate-600">Soal 1 dari 5</span>
-            
-            <div class="flex items-center gap-2">
-              <!-- BADGE TIMER 30 DETIK -->
-              <span id="quiz-timer-badge" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1 transition">
-                <i class="ti ti-clock"></i>
-                <span id="quiz-timer-count">30</span>s
-              </span>
-              <span id="quiz-score-badge" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-medium text-xs">Skor: 0</span>
-            </div>
-          </div>
+    <!-- LANDMARK: FOOTER -->
+    <footer class="mt-12 text-center text-xs text-slate-600 py-4 border-t border-slate-200">
+      <p>&copy; 2026 Praktikum PABWE — Tugas Pemrograman Web Berbasis Komponen.</p>
+    </footer>
 
-          <!-- Progress Bar -->
-          <div class="w-full bg-slate-100 h-2.5 rounded-full mb-6 overflow-hidden">
-            <div id="quiz-progress-bar" class="bg-amber-500 h-full w-0 transition-all duration-300"></div>
-          </div>
-
-          <h3 id="quiz-question" class="font-display text-lg sm:text-xl font-bold text-slate-900 mb-5">
-            Pertanyaan kuis...
-          </h3>
-
-          <div id="quiz-options" class="space-y-2.5 mb-6"></div>
-
-          <!-- Feedback Box -->
-          <div id="quiz-feedback" class="hidden rounded-xl border p-4 text-sm mb-4"></div>
-
-          <div class="flex justify-end">
-            <button
-              type="button"
-              id="quiz-btn-next"
-              class="hidden inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-5 py-2.5 transition shadow"
-            >
-              <span>Lanjut Soal Berikutnya</span>
-              <i class="ti ti-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- View 3: Hasil Kuis -->
-        <div id="quiz-view-result" class="hidden text-center py-6">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 mb-4">
-            <i class="ti ti-trophy text-3xl"></i>
-          </div>
-          <h2 class="font-display text-2xl font-bold text-slate-900 mb-2">Kuis Selesai!</h2>
-          <p id="quiz-result-message" class="text-slate-600 text-sm max-w-md mx-auto mb-6"></p>
-
-          <div class="grid grid-cols-2 gap-4 max-w-xs mx-auto mb-6">
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-              <span class="text-xs text-slate-500 font-medium">Skor Anda</span>
-              <p id="quiz-final-score" class="font-display text-3xl font-bold text-slate-900">0</p>
-            </div>
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
-              <span class="text-xs text-amber-700 font-medium">Rekor Terbaik</span>
-              <p id="quiz-final-high" class="font-display text-3xl font-bold text-amber-800">0</p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            id="quiz-btn-restart"
-            class="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-3 transition shadow"
-          >
-            <i class="ti ti-rotate-clockwise"></i> Ulangi Kuis
-          </button>
-        </div>
-
-      </div>
-    </section>
   </div>
 
   <!-- ================= MODALS ================= -->
 
   <!-- Modal Ubah Transaksi -->
-  <div id="modal-edit-exp" class="fixed inset-0 z-50 hidden items-center justify-center p-4" role="dialog" aria-modal="true">
-    <div class="modal-backdrop absolute inset-0 bg-slate-900/40"></div>
-    <div class="relative w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-xl p-6">
+  <div id="modal-edit-exp" class="fixed inset-0 z-50 hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modal-edit-exp-title">
+    <div class="modal-backdrop absolute inset-0 bg-slate-900/50"></div>
+    <div class="relative w-full max-w-md rounded-2xl bg-white border border-slate-300 shadow-xl p-6">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="font-display text-lg font-semibold text-slate-900 flex items-center gap-2">
-          <i class="ti ti-pencil text-sky-600"></i> Ubah Transaksi
+        <h3 id="modal-edit-exp-title" class="font-display text-lg font-bold text-slate-900 flex items-center gap-2">
+          <i class="ti ti-pencil text-sky-700" aria-hidden="true"></i> Ubah Transaksi
         </h3>
-        <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-600 p-1">
-          <i class="ti ti-x text-lg"></i>
+        <button type="button" class="btn-close-modal text-slate-600 hover:text-slate-900 p-1" aria-label="Tutup dialog ubah transaksi">
+          <i class="ti ti-x text-lg" aria-hidden="true"></i>
         </button>
       </div>
       <form id="exp-edit-form" class="space-y-3.5">
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Deskripsi</label>
-          <input type="text" id="exp-edit-title" required class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500" />
+          <label for="exp-edit-title" class="block text-xs font-bold text-slate-800 mb-1">Deskripsi</label>
+          <input type="text" id="exp-edit-title" required class="w-full rounded-xl border border-slate-400 px-3 py-2 text-sm text-slate-900 focus:ring-2 focus:ring-sky-600" />
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah (Rp)</label>
-          <input type="number" id="exp-edit-amount" min="1" required class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500" />
+          <label for="exp-edit-amount" class="block text-xs font-bold text-slate-800 mb-1">Jumlah (Rp)</label>
+          <input type="number" id="exp-edit-amount" min="1" required class="w-full rounded-xl border border-slate-400 px-3 py-2 text-sm text-slate-900 focus:ring-2 focus:ring-sky-600" />
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Tipe</label>
-            <select id="exp-edit-type" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500">
+            <label for="exp-edit-type" class="block text-xs font-bold text-slate-800 mb-1">Tipe</label>
+            <select id="exp-edit-type" aria-label="Ubah tipe transaksi" class="w-full rounded-xl border border-slate-400 px-3 py-2 text-sm text-slate-900 focus:ring-2 focus:ring-sky-600">
               <option value="expense">Pengeluaran</option>
               <option value="income">Pemasukan</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Kategori</label>
-            <select id="exp-edit-category" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500">
+            <label for="exp-edit-category" class="block text-xs font-bold text-slate-800 mb-1">Kategori</label>
+            <select id="exp-edit-category" aria-label="Ubah kategori transaksi" class="w-full rounded-xl border border-slate-400 px-3 py-2 text-sm text-slate-900 focus:ring-2 focus:ring-sky-600">
               <option value="Makanan">Makanan</option>
               <option value="Transportasi">Transportasi</option>
               <option value="Pendidikan">Pendidikan</option>
@@ -447,68 +522,68 @@
           </div>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal</label>
-          <input type="date" id="exp-edit-date" required class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500" />
+          <label for="exp-edit-date" class="block text-xs font-bold text-slate-800 mb-1">Tanggal</label>
+          <input type="date" id="exp-edit-date" required class="w-full rounded-xl border border-slate-400 px-3 py-2 text-sm text-slate-900 focus:ring-2 focus:ring-sky-600" />
         </div>
         <div class="flex justify-end gap-2 pt-3">
-          <button type="button" class="btn-close-modal rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
-          <button type="submit" class="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 text-sm font-semibold">Simpan</button>
+          <button type="button" class="btn-close-modal rounded-xl border border-slate-400 px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="rounded-xl bg-sky-700 hover:bg-sky-800 text-white px-4 py-2 text-sm font-bold">Simpan</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- Modal Ubah Bookmark -->
-  <div id="modal-edit-bm" class="fixed inset-0 z-50 hidden items-center justify-center p-4" role="dialog" aria-modal="true">
-    <div class="modal-backdrop absolute inset-0 bg-slate-900/40"></div>
-    <div class="relative w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-xl p-6">
+  <div id="modal-edit-bm" class="fixed inset-0 z-50 hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modal-edit-bm-title">
+    <div class="modal-backdrop absolute inset-0 bg-slate-900/50"></div>
+    <div class="relative w-full max-w-md rounded-2xl bg-white border border-slate-300 shadow-xl p-6">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="font-display text-lg font-semibold text-slate-900 flex items-center gap-2">
-          <i class="ti ti-pencil text-indigo-600"></i> Ubah Bookmark
+        <h3 id="modal-edit-bm-title" class="font-display text-lg font-bold text-slate-900 flex items-center gap-2">
+          <i class="ti ti-pencil text-indigo-700" aria-hidden="true"></i> Ubah Bookmark
         </h3>
-        <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-600 p-1">
-          <i class="ti ti-x text-lg"></i>
+        <button type="button" class="btn-close-modal text-slate-600 hover:text-slate-900 p-1" aria-label="Tutup dialog ubah bookmark">
+          <i class="ti ti-x text-lg" aria-hidden="true"></i>
         </button>
       </div>
       <form id="bm-edit-form" class="space-y-3.5">
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Nama / Judul</label>
-          <input type="text" id="bm-edit-title" required class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500" />
+          <label for="bm-edit-title" class="block text-xs font-bold text-slate-800 mb-1">Nama / Judul</label>
+          <input type="text" id="bm-edit-title" required class="w-full rounded-xl border border-slate-400 px-3 py-2 text-sm text-slate-900 focus:ring-2 focus:ring-indigo-600" />
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">URL (Diawali http:// atau https://)</label>
-          <input type="url" id="bm-edit-url" required class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500" />
+          <label for="bm-edit-url" class="block text-xs font-bold text-slate-800 mb-1">URL (Diawali http:// atau https://)</label>
+          <input type="url" id="bm-edit-url" required class="w-full rounded-xl border border-slate-400 px-3 py-2 text-sm text-slate-900 focus:ring-2 focus:ring-indigo-600" />
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Kategori / Tag</label>
-          <input type="text" id="bm-edit-category" required class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500" />
+          <label for="bm-edit-category" class="block text-xs font-bold text-slate-800 mb-1">Kategori / Tag</label>
+          <input type="text" id="bm-edit-category" required class="w-full rounded-xl border border-slate-400 px-3 py-2 text-sm text-slate-900 focus:ring-2 focus:ring-indigo-600" />
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Catatan</label>
-          <input type="text" id="bm-edit-notes" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500" />
+          <label for="bm-edit-notes" class="block text-xs font-bold text-slate-800 mb-1">Catatan</label>
+          <input type="text" id="bm-edit-notes" class="w-full rounded-xl border border-slate-400 px-3 py-2 text-sm text-slate-900 focus:ring-2 focus:ring-indigo-600" />
         </div>
         <div class="flex justify-end gap-2 pt-3">
-          <button type="button" class="btn-close-modal rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
-          <button type="submit" class="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 text-sm font-semibold">Simpan</button>
+          <button type="button" class="btn-close-modal rounded-xl border border-slate-400 px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-100">Batal</button>
+          <button type="submit" class="rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 text-sm font-bold">Simpan</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- Modal Konfirmasi Hapus Universal -->
-  <div id="modal-delete" class="fixed inset-0 z-50 hidden items-center justify-center p-4" role="dialog" aria-modal="true">
-    <div class="modal-backdrop absolute inset-0 bg-slate-900/40"></div>
-    <div class="relative w-full max-w-sm rounded-2xl bg-white border border-slate-200 shadow-xl p-6 text-center">
-      <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 text-rose-600 mb-3">
-        <i class="ti ti-trash text-2xl"></i>
+  <div id="modal-delete" class="fixed inset-0 z-50 hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modal-delete-heading">
+    <div class="modal-backdrop absolute inset-0 bg-slate-900/50"></div>
+    <div class="relative w-full max-w-sm rounded-2xl bg-white border border-slate-300 shadow-xl p-6 text-center">
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 text-rose-800 mb-3">
+        <i class="ti ti-trash text-2xl" aria-hidden="true"></i>
       </div>
-      <h3 class="font-display text-lg font-semibold text-slate-900 mb-1">Konfirmasi Hapus</h3>
-      <p class="text-sm text-slate-600 mb-5">
+      <h3 id="modal-delete-heading" class="font-display text-lg font-bold text-slate-900 mb-1">Konfirmasi Hapus</h3>
+      <p class="text-sm text-slate-700 mb-5">
         Yakin ingin menghapus <strong id="modal-delete-item-title" class="text-slate-900"></strong>? Tindakan ini tidak dapat dibatalkan.
       </p>
       <div class="flex justify-center gap-2">
-        <button type="button" class="btn-close-modal rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
-        <button type="button" id="btn-confirm-delete" class="rounded-xl bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 text-sm font-semibold">Hapus Data</button>
+        <button type="button" class="btn-close-modal rounded-xl border border-slate-400 px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-100">Batal</button>
+        <button type="button" id="btn-confirm-delete" class="rounded-xl bg-rose-700 hover:bg-rose-800 text-white px-4 py-2 text-sm font-bold">Hapus Data</button>
       </div>
     </div>
   </div>
