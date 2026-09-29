@@ -46,20 +46,20 @@
 <body class="font-sans text-slate-800 min-h-screen antialiased">
   <div class="max-w-4xl mx-auto px-4 py-8 sm:py-12">
     
-    <!-- HEADER UTAMA -->
+    <!-- HEADER -->
     <header class="mb-8">
       <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-semibold mb-2">
         <i class="ti ti-apps"></i> Studi Kasus Praktikum 3
       </div>
       <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
-        Aplikasi Terpadu (Single Page App)
+        Workspace & Dashboard Interaktif
       </h1>
       <p class="mt-2 text-slate-600 text-sm sm:text-base">
-        Expense Tracker, Link Manager, dan Kuis Interaktif dengan JavaScript DOM & localStorage.
+        Kelola pengeluaran harian, tautan referensi web, dan uji pengetahuan web lewat kuis interaktif.
       </p>
     </header>
 
-    <!-- NAVIGASI TAB (3.4 Integrasi Tab) -->
+    <!-- NAVIGASI TAB -->
     <nav class="flex gap-1.5 p-1.5 bg-white/90 backdrop-blur border border-slate-200 rounded-2xl shadow-sm mb-8" role="tablist">
       <button
         type="button"
@@ -90,7 +90,7 @@
       </button>
     </nav>
 
-    <!-- ================= 3.1 TAB: EXPENSE TRACKER ================= -->
+    <!-- ================= 3.1 EXPENSE TRACKER ================= -->
     <section id="panel-expense" class="tab-panel space-y-6">
       <!-- Ringkasan Saldo -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -218,7 +218,7 @@
       </div>
     </section>
 
-    <!-- ================= 3.2 TAB: BOOKMARK MANAGER ================= -->
+    <!-- ================= 3.2 BOOKMARK MANAGER ================= -->
     <section id="panel-bookmark" class="tab-panel hidden space-y-6">
       <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm">
         <h2 class="font-display text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
@@ -244,7 +244,7 @@
           <input
             type="text"
             id="bm-category"
-            placeholder="Tag / Kategori (contoh: Kuliah, Belajar, Referensi)..."
+            placeholder="Tag / Kategori (contoh: Kuliah, Belajar)..."
             required
             class="rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
@@ -300,7 +300,7 @@
       </div>
     </section>
 
-    <!-- ================= 3.3 TAB: KUIS INTERAKTIF ================= -->
+    <!-- ================= 3.3 KUIS INTERAKTIF ================= -->
     <section id="panel-quiz" class="tab-panel hidden space-y-6">
       <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
         
@@ -311,7 +311,7 @@
           </div>
           <h2 class="font-display text-2xl font-bold text-slate-900 mb-2">Kuis Pemrograman Web</h2>
           <p class="text-slate-600 text-sm max-w-md mx-auto mb-6">
-            Uji pemahaman JavaScript, DOM, dan Web Development dasar melalui 5 soal pilihan ganda.
+            Uji pemahaman JavaScript, DOM, dan Web Development dasar melalui 5 soal pilihan ganda. Waktu pengerjaan adalah <strong>30 detik</strong> per soal.
           </p>
 
           <div class="inline-block bg-slate-50 border border-slate-200 rounded-xl px-5 py-3 mb-6">
@@ -332,9 +332,17 @@
 
         <!-- View 2: Tampilan Soal & Opsi -->
         <div id="quiz-view-play" class="hidden">
-          <div class="flex items-center justify-between mb-3 text-sm">
+          <div class="flex items-center justify-between mb-3 text-sm flex-wrap gap-2">
             <span id="quiz-progress-text" class="font-semibold text-slate-600">Soal 1 dari 5</span>
-            <span id="quiz-score-badge" class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium">Skor: 0</span>
+            
+            <div class="flex items-center gap-2">
+              <!-- BADGE TIMER 30 DETIK -->
+              <span id="quiz-timer-badge" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1 transition">
+                <i class="ti ti-clock"></i>
+                <span id="quiz-timer-count">30</span>s
+              </span>
+              <span id="quiz-score-badge" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-medium text-xs">Skor: 0</span>
+            </div>
           </div>
 
           <!-- Progress Bar -->
@@ -395,7 +403,7 @@
     </section>
   </div>
 
-  <!-- ================= MODALS (UBAH & HAPUS) ================= -->
+  <!-- ================= MODALS ================= -->
 
   <!-- Modal Ubah Transaksi -->
   <div id="modal-edit-exp" class="fixed inset-0 z-50 hidden items-center justify-center p-4" role="dialog" aria-modal="true">
@@ -505,7 +513,7 @@
     </div>
   </div>
 
-  <!-- Script Logika -->
+  <!-- SCRIPT -->
   <script src="assets/script.js"></script>
 </body>
 </html>
