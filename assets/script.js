@@ -5,7 +5,7 @@
  * 2. Integrasi Navigasi Tab via Query URL (URLSearchParams & history.replaceState) (3.4)
  * 3. Catatan Pengeluaran Harian / Expense Tracker CRUD + Validasi Lengkap (3.1)
  * 4. Bookmark / Link Manager (3.2)
- * 5. Kuis Interaktif dengan Countdown Timer 30 Detik (3.3)
+ * 5. Kuis Interaktif dengan Countdown Timer 20 Detik (3.3)
  */
 
 /* ==========================================================================
@@ -620,11 +620,11 @@ bmSort.addEventListener("change", renderBookmarks);
 
 
 /* ==========================================================================
-   5. KUIS INTERAKTIF DENGAN TIMER 30 DETIK (3.3)
+   5. KUIS INTERAKTIF DENGAN TIMER 20 DETIK (3.3)
    ========================================================================== */
 
 const QUIZ_STORAGE_KEY = "pabwe-sk-quiz-highscore";
-const QUESTION_DURATION = 30;
+const QUESTION_DURATION = 20;
 
 const QUIZ_DATA = [
   {
@@ -710,7 +710,7 @@ function stopQuizTimer() {
   }
 }
 
-/** Mulai countdown timer 30 detik */
+/** Mulai countdown timer 20 detik */
 function startQuizTimer() {
   stopQuizTimer();
   timeLeft = QUESTION_DURATION;
