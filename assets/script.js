@@ -2,8 +2,8 @@
  * Studi Kasus Praktikum 3 — PABWE
  * Fitur:
  * 1. Utilitas & Modal Manager
- * 2. Integrasi Navigasi Tab Persisten (3.4)
- * 3. Catatan Pengeluaran Harian / Expense Tracker (3.1)
+ * 2. Integrasi Navigasi Tab via Query URL (URLSearchParams & history.replaceState) (3.4)
+ * 3. Catatan Pengeluaran Harian / Expense Tracker CRUD + Validasi Lengkap (3.1)
  * 4. Bookmark / Link Manager (3.2)
  * 5. Kuis Interaktif dengan Countdown Timer 30 Detik (3.3)
  */
@@ -88,10 +88,11 @@ btnConfirmDelete.addEventListener("click", () => {
 
 
 /* ==========================================================================
-   2. INTEGRASI TAB PERSISTEN (3.4)
+   2. INTEGRASI TAB VIA QUERY URL (3.4)
+   Menggunakan URLSearchParams & window.history.replaceState (?tab=expense|bookmark|quiz)
    ========================================================================== */
 
-const TAB_STORAGE_KEY = "pabwe-sk-active-tab";
+const VALID_TABS = ["expense", "bookmark", "quiz"];
 const tabButtons = $all(".tab-btn");
 const panels = {
   expense: $("#panel-expense"),
@@ -99,15 +100,27 @@ const panels = {
   quiz: $("#panel-quiz"),
 };
 
-function switchTab(targetTab) {
-  if (!panels[targetTab]) targetTab = "expense";
+/** Ambil nama tab aktif dari Query URL (?tab=...) */
+function getActiveTabFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get("tab");
+  return VALID_TABS.includes(tab) ? tab : "expense";
+}
+
+/**
+ * Ganti tab aktif, perbarui visibilitas panel, dan sinkronkan URL via history.replaceState
+ * @param {string} targetTab - Nama tab ('expense' | 'bookmark' | 'quiz')
+ * @param {boolean} updateUrl - Apakah perlu memanggil replaceState
+ */
+function switchTab(targetTab, updateUrl = true) {
+  if (!VALID_TABS.includes(targetTab)) targetTab = "expense";
 
   // Hentikan timer kuis jika keluar dari tab kuis
   if (targetTab !== "quiz" && typeof stopQuizTimer === "function") {
     stopQuizTimer();
   }
 
-  // Tampilkan panel yang dipilih, sembunyikan yang lain
+  // Tampilkan panel yang sesuai dan sembunyikan yang lain
   Object.keys(panels).forEach((key) => {
     if (key === targetTab) {
       panels[key].classList.remove("hidden");
@@ -116,7 +129,7 @@ function switchTab(targetTab) {
     }
   });
 
-  // Update style tombol tab aktif
+  // Perbarui status tombol tab (Aria & styling)
   tabButtons.forEach((btn) => {
     const isCurrent = btn.getAttribute("data-tab") === targetTab;
     btn.setAttribute("aria-selected", isCurrent ? "true" : "false");
@@ -129,19 +142,30 @@ function switchTab(targetTab) {
     }
   });
 
-  // Render ulang data pada tab yang aktif
+  // Sinkronkan parameter query URL jika updateUrl bernilai true
+  if (updateUrl) {
+    const currentUrl = new URL(window.location);
+    currentUrl.searchParams.set("tab", targetTab);
+    window.history.replaceState({ tab: targetTab }, "", currentUrl.toString());
+  }
+
+  // Render ulang data pada tab terkait
   if (targetTab === "expense") renderExpenses();
   if (targetTab === "bookmark") renderBookmarks();
-
-  localStorage.setItem(TAB_STORAGE_KEY, targetTab);
 }
 
 // Event listener klik untuk tombol tab
 tabButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     const tabName = btn.getAttribute("data-tab");
-    switchTab(tabName);
+    switchTab(tabName, true);
   });
+});
+
+// Tangani tombol Back / Forward browser
+window.addEventListener("popstate", () => {
+  const currentTab = getActiveTabFromUrl();
+  switchTab(currentTab, false);
 });
 
 
@@ -317,21 +341,38 @@ function renderExpenses() {
   updateExpenseSummary();
 }
 
+// Submit Form Tambah Transaksi
 expForm.addEventListener("submit", (e) => {
   e.preventDefault();
+  const title = expTitle.value.trim();
   const amount = Number(expAmount.value);
-  if (amount <= 0) {
-    alert("Jumlah nominal harus lebih besar dari 0.");
+  const date = expDate.value;
+
+  if (!title) {
+    alert("Deskripsi transaksi wajib diisi.");
+    expTitle.focus();
+    return;
+  }
+
+  if (isNaN(amount) || amount <= 0) {
+    alert("Jumlah nominal harus berupa angka yang lebih besar dari 0.");
+    expAmount.focus();
+    return;
+  }
+
+  if (!date) {
+    alert("Tanggal transaksi wajib diisi.");
+    expDate.focus();
     return;
   }
 
   expenses.push({
     id: crypto.randomUUID(),
-    title: expTitle.value.trim(),
+    title,
     amount,
     type: expType.value,
     category: expCategory.value,
-    date: expDate.value,
+    date,
     createdAt: Date.now(),
   });
 
@@ -341,15 +382,38 @@ expForm.addEventListener("submit", (e) => {
   renderExpenses();
 });
 
+// Submit Form Edit Transaksi (DENGAN VALIDASI LENGKAP KONSISTEN)
 expEditForm.addEventListener("submit", (e) => {
   e.preventDefault();
+  const title = expEditTitle.value.trim();
+  const amount = Number(expEditAmount.value);
+  const date = expEditDate.value;
+
+  if (!title) {
+    alert("Deskripsi transaksi tidak boleh kosong.");
+    expEditTitle.focus();
+    return;
+  }
+
+  if (isNaN(amount) || amount <= 0) {
+    alert("Jumlah nominal harus berupa angka yang lebih besar dari 0.");
+    expEditAmount.focus();
+    return;
+  }
+
+  if (!date) {
+    alert("Tanggal transaksi wajib diisi.");
+    expEditDate.focus();
+    return;
+  }
+
   const item = expenses.find((t) => t.id === editingExpenseId);
   if (item) {
-    item.title = expEditTitle.value.trim();
-    item.amount = Number(expEditAmount.value);
+    item.title = title;
+    item.amount = amount;
     item.type = expEditType.value;
     item.category = expEditCategory.value;
-    item.date = expEditDate.value;
+    item.date = date;
 
     saveExpenses();
     renderExpenses();
@@ -808,7 +872,7 @@ quizBtnRestart.addEventListener("click", startQuiz);
 
 
 /* ==========================================================================
-   6. INISIALISASI HALAMAN OTOMATIS
+   6. INISIALISASI HALAMAN
    ========================================================================== */
 
 function initializeApp() {
@@ -816,12 +880,11 @@ function initializeApp() {
   renderBookmarks();
   updateHighScoreUI();
 
-  // Buka tab yang tersimpan di localStorage (default: expense)
-  const initialTab = localStorage.getItem(TAB_STORAGE_KEY) || "expense";
-  switchTab(initialTab);
+  // Buka tab berdasarkan parameter query URL saat halaman pertama kali dibuka
+  const initialTab = getActiveTabFromUrl();
+  switchTab(initialTab, false);
 }
 
-// Jalankan inisialisasi tanpa terpengaruh timing browser
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initializeApp);
 } else {
