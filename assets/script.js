@@ -2,10 +2,10 @@
  * Studi Kasus Praktikum 3 — PABWE
  * Fitur:
  * 1. Utilitas & Modal Manager
- * 2. Integrasi Navigasi Tab via Query URL (URLSearchParams & history.replaceState) (3.4)
- * 3. Catatan Pengeluaran Harian / Expense Tracker CRUD + Validasi Lengkap (3.1)
- * 4. Bookmark / Link Manager (3.2)
- * 5. Kuis Interaktif dengan Countdown Timer 20 Detik (3.3)
+ * 2. Integrasi Tab & Penyimpanan Status ke localStorage (3.4)
+ * 3. Catatan Pengeluaran Harian / Expense Tracker CRUD + Ringkasan (3.1)
+ * 4. Bookmark / Link Manager CRUD + Validasi URL (3.2)
+ * 5. Kuis Interaktif dengan Timer 20 Detik & High Score (3.3)
  */
 
 /* ==========================================================================
@@ -20,7 +20,7 @@ const $ = (selector) => {
 
 const $all = (selector) => document.querySelectorAll(selector);
 
-/** Format bilangan ke format Rupiah */
+/** Format angka ke Rupiah */
 function formatRupiah(amount) {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -88,10 +88,10 @@ btnConfirmDelete.addEventListener("click", () => {
 
 
 /* ==========================================================================
-   2. INTEGRASI TAB VIA QUERY URL (3.4)
-   Menggunakan URLSearchParams & window.history.replaceState (?tab=expense|bookmark|quiz)
+   2. INTEGRASI TAB VIA LOCALSTORAGE (3.4)
    ========================================================================== */
 
+const TAB_STORAGE_KEY = "pabwe-p3-active-tab";
 const VALID_TABS = ["expense", "bookmark", "quiz"];
 const tabButtons = $all(".tab-btn");
 const panels = {
@@ -100,27 +100,22 @@ const panels = {
   quiz: $("#panel-quiz"),
 };
 
-/** Ambil nama tab aktif dari Query URL (?tab=...) */
-function getActiveTabFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  const tab = params.get("tab");
-  return VALID_TABS.includes(tab) ? tab : "expense";
+/** Ambil tab terakhir dari localStorage (default: expense) */
+function getActiveTab() {
+  const saved = localStorage.getItem(TAB_STORAGE_KEY);
+  return VALID_TABS.includes(saved) ? saved : "expense";
 }
 
-/**
- * Ganti tab aktif, perbarui visibilitas panel, dan sinkronkan URL via history.replaceState
- * @param {string} targetTab - Nama tab ('expense' | 'bookmark' | 'quiz')
- * @param {boolean} updateUrl - Apakah perlu memanggil replaceState
- */
-function switchTab(targetTab, updateUrl = true) {
+/** Ganti tab aktif, perbarui visibilitas panel, dan simpan ke localStorage */
+function switchTab(targetTab) {
   if (!VALID_TABS.includes(targetTab)) targetTab = "expense";
 
-  // Hentikan timer kuis jika keluar dari tab kuis
+  // Hentikan timer kuis jika berpindah dari tab kuis
   if (targetTab !== "quiz" && typeof stopQuizTimer === "function") {
     stopQuizTimer();
   }
 
-  // Tampilkan panel yang sesuai dan sembunyikan yang lain
+  // Tampilkan panel yang sesuai
   Object.keys(panels).forEach((key) => {
     if (key === targetTab) {
       panels[key].classList.remove("hidden");
@@ -129,7 +124,7 @@ function switchTab(targetTab, updateUrl = true) {
     }
   });
 
-  // Perbarui status tombol tab (Aria & styling)
+  // Perbarui status & styling tombol tab
   tabButtons.forEach((btn) => {
     const isCurrent = btn.getAttribute("data-tab") === targetTab;
     btn.setAttribute("aria-selected", isCurrent ? "true" : "false");
@@ -142,30 +137,20 @@ function switchTab(targetTab, updateUrl = true) {
     }
   });
 
-  // Sinkronkan parameter query URL jika updateUrl bernilai true
-  if (updateUrl) {
-    const currentUrl = new URL(window.location);
-    currentUrl.searchParams.set("tab", targetTab);
-    window.history.replaceState({ tab: targetTab }, "", currentUrl.toString());
-  }
+  // Simpan ke localStorage
+  localStorage.setItem(TAB_STORAGE_KEY, targetTab);
 
   // Render ulang data pada tab terkait
   if (targetTab === "expense") renderExpenses();
   if (targetTab === "bookmark") renderBookmarks();
 }
 
-// Event listener klik untuk tombol tab
+// Event listener klik tombol tab
 tabButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     const tabName = btn.getAttribute("data-tab");
-    switchTab(tabName, true);
+    switchTab(tabName);
   });
-});
-
-// Tangani tombol Back / Forward browser
-window.addEventListener("popstate", () => {
-  const currentTab = getActiveTabFromUrl();
-  switchTab(currentTab, false);
 });
 
 
@@ -341,7 +326,7 @@ function renderExpenses() {
   updateExpenseSummary();
 }
 
-// Submit Form Tambah Transaksi
+// Tambah Transaksi
 expForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const title = expTitle.value.trim();
@@ -382,7 +367,7 @@ expForm.addEventListener("submit", (e) => {
   renderExpenses();
 });
 
-// Submit Form Edit Transaksi (DENGAN VALIDASI LENGKAP KONSISTEN)
+// Edit Transaksi
 expEditForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const title = expEditTitle.value.trim();
@@ -682,7 +667,7 @@ const quizResultMsg = $("#quiz-result-message");
 const quizFinalScore = $("#quiz-final-score");
 const quizFinalHigh = $("#quiz-final-high");
 
-// Elemen & State Timer
+// State Timer
 const quizTimerCount = $("#quiz-timer-count");
 const quizTimerBadge = $("#quiz-timer-badge");
 let timerInterval = null;
@@ -702,7 +687,6 @@ function updateHighScoreUI() {
   quizHighScoreDisplay.textContent = high !== null ? `${high} / ${QUIZ_DATA.length * 20}` : "Belum ada";
 }
 
-/** Hentikan timer */
 function stopQuizTimer() {
   if (timerInterval) {
     clearInterval(timerInterval);
@@ -710,7 +694,6 @@ function stopQuizTimer() {
   }
 }
 
-/** Mulai countdown timer 20 detik */
 function startQuizTimer() {
   stopQuizTimer();
   timeLeft = QUESTION_DURATION;
@@ -732,7 +715,6 @@ function startQuizTimer() {
   }, 1000);
 }
 
-/** Handler jika waktu habis */
 function handleTimeOut() {
   if (isAnswered) return;
   isAnswered = true;
@@ -880,9 +862,9 @@ function initializeApp() {
   renderBookmarks();
   updateHighScoreUI();
 
-  // Buka tab berdasarkan parameter query URL saat halaman pertama kali dibuka
-  const initialTab = getActiveTabFromUrl();
-  switchTab(initialTab, false);
+  // Buka tab terakhir yang tersimpan di localStorage saat reload
+  const initialTab = getActiveTab();
+  switchTab(initialTab);
 }
 
 if (document.readyState === "loading") {

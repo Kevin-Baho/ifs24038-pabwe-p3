@@ -6,7 +6,7 @@
   <meta name="description" content="Aplikasi Web Terpadu Praktikum 3 PABWE: Catatan Pengeluaran Harian, Bookmark Manager, dan Kuis Interaktif." />
   <title>Studi Kasus — Praktikum 3 PABWE</title>
 
-  <!-- Preconnect untuk mempercepat koneksi CDN -->
+  <!-- Preconnect untuk Resource Eksternal -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
@@ -27,7 +27,7 @@
     };
   </script>
 
-  <!-- Google Fonts (Non-blocking load) -->
+  <!-- Google Fonts (Non-blocking) -->
   <link
     rel="preload"
     as="style"
@@ -40,7 +40,7 @@
     onload="this.media='all'"
   />
 
-  <!-- Tabler Icons (Non-blocking load) -->
+  <!-- Tabler Icons (Non-blocking) -->
   <link
     rel="preload"
     as="style"
@@ -78,7 +78,7 @@
         Kelola pengeluaran harian, tautan referensi web, dan uji pengetahuan web lewat kuis interaktif.
       </p>
 
-      <!-- NAVIGASI TAB -->
+      <!-- NAVIGASI TAB (3.4) -->
       <nav id="main-tab-nav" class="flex gap-1.5 p-1.5 bg-white/95 backdrop-blur border border-slate-300 rounded-2xl shadow-sm mt-6" role="tablist" aria-label="Navigasi Menu Utama">
         <button
           type="button"
@@ -606,7 +606,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT DENGAN DEFER -->
+  <!-- SCRIPT UTAMA -->
   <script src="assets/script.js" defer></script>
 </body>
 </html>
